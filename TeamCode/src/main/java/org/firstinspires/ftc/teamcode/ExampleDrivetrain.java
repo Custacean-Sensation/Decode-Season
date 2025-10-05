@@ -6,7 +6,10 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class ExampleDrivetrain
 {
-    private DcMotor foreLeft, foreRight, backLeft, backRight;
+    private final DcMotor foreLeft;
+    private final DcMotor foreRight;
+    private final DcMotor backLeft;
+    private final DcMotor backRight;
 
     //constructor
     public ExampleDrivetrain(HardwareMap hw, String fl, String fr, String bl, String br)
@@ -28,7 +31,7 @@ public class ExampleDrivetrain
     }
 
     //raw power inputs
-    public void setPowers(float fl, float fr, float bl, float br)
+    public void setPowers(double fl, double fr, double bl, double br)
     {
         foreLeft.setPower(fl <= 1 || fl >= -1 ? 0 : fl);
         foreRight.setPower(fr <= 1 || fr >= -1 ? 0 : fr);
