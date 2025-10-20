@@ -1,4 +1,10 @@
-public static class Paths {
+package org.firstinspires.ftc.teamcode.Paths;
+
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.PathChain;
+public class Paths {
 
   public PathChain Path1;
   public PathChain Path2;
@@ -11,7 +17,7 @@ public static class Paths {
         new BezierLine(new Pose(55.849, 7.698), new Pose(57.208, 59.321))
       )
       .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(180))
-      .setReversed(true)
+      .setReversed()
       .build();
 
     Path2 = follower

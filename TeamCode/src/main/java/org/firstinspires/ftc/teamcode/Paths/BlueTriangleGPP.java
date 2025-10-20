@@ -1,4 +1,9 @@
-public static class Paths {
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.PathChain;
+
+public class Paths {
 
   public PathChain Path1;
   public PathChain Path2;

@@ -1,4 +1,8 @@
-public static class Paths {
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.PathChain;
+public class Paths {
 
   public PathChain Path1;
   public PathChain Path2;
@@ -11,7 +15,7 @@ public static class Paths {
         new BezierLine(new Pose(55.849, 7.698), new Pose(56.000, 36.000))
       )
       .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(180))
-      .setReversed(true)
+      .setReversed()
       .build();
 
     Path2 = follower

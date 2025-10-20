@@ -1,4 +1,11 @@
-public static class Paths {
+package org.firstinspires.ftc.teamcode.Paths;
+
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.PathChain;
+
+public class Paths {
 
   public PathChain Path5;
 
