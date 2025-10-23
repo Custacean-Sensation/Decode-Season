@@ -59,7 +59,7 @@ public class Auto1 extends OpMode{
     double robotRotationAngle = 45;
 
     /*
-     * Here we create three timers which we use in different parts of our code. Each of these is an
+     * Here we create three timers, which we use in different parts of our code. Each of these is an
      * "object," so even though they are all an instance of ElapsedTime(), they count independently
      * from each other.
      */
@@ -144,11 +144,13 @@ public class Auto1 extends OpMode{
          * to 'get' must correspond to the names assigned during the robot configuration
          * step (using the FTC Robot Controller app on the driver's station).
          */
-        leftDrive  = hardwareMap.get(DcMotor.class, "left_drive");
-        rightDrive = hardwareMap.get(DcMotor.class, "right_drive");
+        leftDrive  = hardwareMap.get(DcMotor.class, "foreLeftDrive");
+        rightDrive = hardwareMap.get(DcMotor.class, "foreRightDrive");
         launcher = hardwareMap.get(DcMotorEx.class,"launcher");
         leftFeeder = hardwareMap.get(CRServo.class, "left_feeder");
         rightFeeder = hardwareMap.get(CRServo.class, "right_feeder");
+
+
 
 
         /*
