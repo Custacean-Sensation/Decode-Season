@@ -33,6 +33,7 @@ public class TeleOpHEHE extends OpMode {
     private DcMotorEx launcher = null;
     private CRServo leftFeeder = null;
     private CRServo rightFeeder = null;
+    private ExampleDrivetrain dt = new ExampleDrivetrain();
 
     ElapsedTime feederTimer = new ElapsedTime();
 
@@ -159,7 +160,7 @@ public class TeleOpHEHE extends OpMode {
          * both motors work to rotate the robot. Combinations of these inputs can be used to create
          * more complex maneuvers.
          */
-        arcadeDrive(-gamepad1.left_stick_y, gamepad1.right_stick_x);
+        mecanumDrive(-gamepad1.left_stick_y, gamepad1.right_stick_x);
 
         /*
          * Here we give the user control of the speed of the launcher motor without automatically
@@ -192,15 +193,13 @@ public class TeleOpHEHE extends OpMode {
     public void stop() {
     }
 
-    void arcadeDrive(double forward, double rotate) {
-        leftPower = forward + rotate;
-        rightPower = forward - rotate;
+    void mecanumDrive(double forward, double rotate, double yaw) {
+        double foreLeftPower = (forward - rotate) - yaw;
+        double foreRightPower = (forward + rotate) + yaw;
+        double backLeftPower = (forward - rotate) - yaw;
+        double backRightPower = (forward + rotate) + yaw;
 
-        /*
-         * Send calculated power to wheels
-         */
-        leftDrive.setPower(leftPower);
-        rightDrive.setPower(rightPower);
+        dt.setPowers(foreLeftPower, foreRightPower, backLeftPower, backRightPower);
     }
 
     void launch(boolean shotRequested) {
