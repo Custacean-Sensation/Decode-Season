@@ -92,12 +92,6 @@ public class ExampleDrivetrain
         backRight.setPower(speed);
         backLeft.setPower(speed);
 
-        try {
-            sleep(2000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
         return true;
     }
 
@@ -127,12 +121,6 @@ public class ExampleDrivetrain
         foreLeft.setPower(speed);
         backLeft.setPower(speed);
         backRight.setPower(speed);
-
-        try {
-            sleep(2000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
 
         return true;
     }
