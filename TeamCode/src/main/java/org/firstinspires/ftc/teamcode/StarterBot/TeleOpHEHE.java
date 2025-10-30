@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.ExampleDrivetrain;
 
 @TeleOp(name = "StarterBotTeleop")
 public class TeleOpHEHE extends OpMode {
-    final double FEED_TIME_SECONDS = 0.20; //The feeder servos run this long when a shot is requested.
+    final double FEED_TIME_SECONDS = 0.40; //The feeder servos run this long when a shot is requested.
     final double STOP_SPEED = 0.0; //We send this power to the servos when we want them to stop.
     final double FULL_SPEED = 1.0;
 
@@ -30,8 +30,10 @@ public class TeleOpHEHE extends OpMode {
     final double LAUNCHER_MIN_VELOCITY = 1075;
 
     // Declare OpMode members.
-    private DcMotor leftDrive = null;
-    private DcMotor rightDrive = null;
+    private DcMotor leftFrontDrive = null;
+    //private DcMotor rightFrontDrive = null;
+    private DcMotor leftBackDrive = null;
+    //private DcMotor rightBackDrive = null;
     private DcMotorEx launcher = null;
     private CRServo leftFeeder = null;
     private CRServo rightFeeder = null;
@@ -85,6 +87,7 @@ public class TeleOpHEHE extends OpMode {
         rightFeeder = hardwareMap.get(CRServo.class, "rightFeeder");
 
         dt = new ExampleDrivetrain(hardwareMap, "frontLeft", "frontRight", "backLeft", "backRight");
+
         /*
          * Here we set our launcher to the RUN_USING_ENCODER runmode.
          * If you notice that you have no control over the velocity of the motor, it just jumps
@@ -99,6 +102,8 @@ public class TeleOpHEHE extends OpMode {
          * slow down much faster when it is coasting. This creates a much more controllable
          * drivetrain. As the robot stops much quicker.
          */
+        //leftDrive.setZeroPowerBehavior(BRAKE);
+        //rightDrive.setZeroPowerBehavior(BRAKE);
         launcher.setZeroPowerBehavior(BRAKE);
 
         /*
@@ -149,7 +154,8 @@ public class TeleOpHEHE extends OpMode {
          * both motors work to rotate the robot. Combinations of these inputs can be used to create
          * more complex maneuvers.
          */
-        mecanumDrive(-gamepad1.left_stick_y, gamepad1.left_stick_x,gamepad1.right_stick_x);
+        mecanumDrive(gamepad1.left_stick_x, gamepad1.left_stick_y,gamepad1.right_stick_x);
+        telemetry.addData("gamepad1 left stick", gamepad1.left_stick_y);
 
         /*
          * Here we give the user control of the speed of the launcher motor without automatically
@@ -164,7 +170,11 @@ public class TeleOpHEHE extends OpMode {
         /*
          * Now we call our "Launch" function.
          */
-        launch(gamepad1.rightBumperWasPressed());
+        launch(gamepad1.right_bumper);
+        if(gamepad1.left_bumper){
+            leftFeeder.setPower(1.0);
+            rightFeeder.setPower(1.0);
+        }
 
         /*
          * Show the state and motor powers
@@ -185,10 +195,14 @@ public class TeleOpHEHE extends OpMode {
     void mecanumDrive(double forward, double rotate, double yaw) {
         double foreLeftPower = (forward - rotate) - yaw;
         double foreRightPower = (forward + rotate) + yaw;
-        double backLeftPower = (forward - rotate) - yaw;
-        double backRightPower = (forward + rotate) + yaw;
+        double backLeftPower = (forward + rotate) - yaw;
+        double backRightPower = (forward - rotate) + yaw;
 
         dt.setPowers(foreLeftPower, foreRightPower, backLeftPower, backRightPower);
+        //leftFrontDrive.setPower(foreLeftPower);
+        //rightFrontDrive.setPower(foreRightPower);
+        //leftBackDrive.setPower(backLeftPower);
+        //rightBackDrive.setPower(backRightPower);
     }
 
     void launch(boolean shotRequested) {
@@ -199,7 +213,7 @@ public class TeleOpHEHE extends OpMode {
                 }
                 break;
             case SPIN_UP:
-                launcher.setVelocity(LAUNCHER_TARGET_VELOCITY);
+                launcher.setVelocity(LAUNCHER_TARGET_VELOCITY * 1.25);
                 if (launcher.getVelocity() > LAUNCHER_MIN_VELOCITY) {
                     launchState = LaunchState.LAUNCH;
                 }

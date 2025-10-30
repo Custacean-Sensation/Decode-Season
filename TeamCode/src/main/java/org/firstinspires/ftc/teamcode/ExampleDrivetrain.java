@@ -24,15 +24,15 @@ public class ExampleDrivetrain
     //constructor
     public ExampleDrivetrain(HardwareMap hw, String fl, String fr, String bl, String br)
     {
-        foreLeft = hw.get(DcMotor.class, fl);
-        foreRight = hw.get(DcMotor.class, fr);
+        foreLeft = hw.get(DcMotor.class, fr);
+        foreRight = hw.get(DcMotor.class, br);
         backLeft = hw.get(DcMotor.class, bl);
-        backRight = hw.get(DcMotor.class, br);
+        backRight = hw.get(DcMotor.class, fl);
 
         foreLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        foreRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        foreRight.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        backRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         foreLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         foreRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -43,10 +43,10 @@ public class ExampleDrivetrain
     //raw power inputs
     public void setPowers(double fl, double fr, double bl, double br)
     {
-        foreLeft.setPower(fl <= 1 || fl >= -1 ? 0 : fl);
-        foreRight.setPower(fr <= 1 || fr >= -1 ? 0 : fr);
-        backLeft.setPower(bl <= 1 || bl >= -1 ? 0 : bl);
-        backRight.setPower(br <= 1 || br >= -1 ? 0 : br);
+        foreLeft.setPower(fl);
+        foreRight.setPower(fr);
+        backLeft.setPower(bl);
+        backRight.setPower(br);
     }
 
     //STOP
