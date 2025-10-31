@@ -21,9 +21,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.ExampleDrivetrain;
 
-@Autonomous(name="StarterBotAuto")
-public class Auto1 extends OpMode{
-    final double FEED_TIME = 0.25; //The feeder servos run this long when a shot is requested.
+@Autonomous(name="StarterBotAutoWait")
+public class Auto2 extends OpMode{
+    final double FEED_TIME = 0.20; //The feeder servos run this long when a shot is requested.
 
     /*
      * When we control our launcher motor, we are using encoders. These allow the control system
@@ -108,8 +108,7 @@ public class Auto1 extends OpMode{
         AWAY,
         LAUNCH,
         WAIT_FOR_LAUNCH,
-        DRIVING_AWAY_FROM_GOAL,
-        DONE
+        DRIVING_AWAY_FROM_GOAL
     }
 
     private AutonomousState autonomousState;
@@ -211,6 +210,14 @@ public class Auto1 extends OpMode{
      */
     @Override
     public void start() {
+        ElapsedTime autonomousTimer = new ElapsedTime();
+        autonomousTimer.reset();
+
+        // Wait for a specific amount of time, e.g., 3 seconds
+        while (autonomousTimer.seconds() < 8.0) {
+            // Do nothing, just wait for the timer
+            // The robot will not move until the timer reaches 3 seconds
+        }
     }
 
     /*
@@ -279,13 +286,9 @@ public class Auto1 extends OpMode{
                  * the robot has been within a tolerance of the target position for "holdSeconds."
                  * Once the function returns "true" we reset the encoders again and move on.
                  */
-                if(dt.tankDrive(DRIVE_SPEED, 70, DistanceUnit.INCH)) {
-
-                    dt.resetEncoders();
-                    autonomousState = AutonomousState.DONE;
-                    break;
+                if(dt.tankDrive(DRIVE_SPEED, 40, DistanceUnit.INCH)){
+                    dt.stop();
                 }
-            case DONE:
                 break;
         }
 

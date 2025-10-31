@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 import static java.lang.Thread.sleep;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -24,20 +25,20 @@ public class ExampleDrivetrain
     //constructor
     public ExampleDrivetrain(HardwareMap hw, String fl, String fr, String bl, String br)
     {
-        foreLeft = hw.get(DcMotor.class, fr);
-        foreRight = hw.get(DcMotor.class, br);
+        foreLeft = hw.get(DcMotor.class, fl);
+        foreRight = hw.get(DcMotor.class, fr);
         backLeft = hw.get(DcMotor.class, bl);
-        backRight = hw.get(DcMotor.class, fl);
+        backRight = hw.get(DcMotor.class, br);
 
-        foreLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        foreRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        backLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        foreLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        foreRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        backRight.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        foreLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        foreRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        foreLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        foreRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     //raw power inputs
@@ -50,12 +51,20 @@ public class ExampleDrivetrain
     }
 
     //STOP
-    public void stop()
+    public boolean stop()
     {
         foreLeft.setPower(0);
         foreRight.setPower(0);
         backLeft.setPower(0);
         backRight.setPower(0);
+
+        foreLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        foreRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        return true;
+
     }
 
     //if you want you could implement simple movements below ill just do move forward
@@ -65,10 +74,17 @@ public class ExampleDrivetrain
     }
 
     public void resetEncoders(){
+        foreLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        foreRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         foreLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         foreRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backLeft.setMode((DcMotor.RunMode.STOP_AND_RESET_ENCODER));
+        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        setPowers(0,0,0,0);
     }
 
     public boolean tankDrive(double speed, double distance, DistanceUnit distanceUnit){
@@ -77,21 +93,29 @@ public class ExampleDrivetrain
 
         double targetPosition = (distanceUnit.toMm(distance) * TICKS_PER_MM);
 
+        resetEncoders();
+
+        foreLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        foreRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         foreLeft.setTargetPosition((int) targetPosition);
         foreRight.setTargetPosition((int) targetPosition);
         backLeft.setTargetPosition((int) targetPosition);
         backRight.setTargetPosition((int) targetPosition);
 
-        foreLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         foreRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        foreLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         foreLeft.setPower(speed);
         foreRight.setPower(speed);
         backRight.setPower(speed);
         backLeft.setPower(speed);
 
+        while(foreLeft.isBusy() || foreRight.isBusy() || backLeft.isBusy() || backRight.isBusy()){}
         return true;
     }
 
@@ -103,6 +127,9 @@ public class ExampleDrivetrain
         double leftTargetPosition = -(targetMm*TICKS_PER_MM);
         double rightTargetPosition = targetMm*TICKS_PER_MM;
 
+        //reset encoders
+        resetEncoders();
+
         //set left side motors
         foreLeft.setTargetPosition((int) leftTargetPosition);
         backLeft.setTargetPosition((int) leftTargetPosition);
@@ -111,17 +138,44 @@ public class ExampleDrivetrain
         foreRight.setTargetPosition((int) rightTargetPosition);
         backRight.setTargetPosition((int) rightTargetPosition);
 
-        //drive motors
-        foreLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        foreLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        foreRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         foreRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        foreLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        foreRight.setPower(speed);
         foreLeft.setPower(speed);
-        backLeft.setPower(speed);
+        foreRight.setPower(speed);
         backRight.setPower(speed);
+        backLeft.setPower(speed);
+
+        while(foreLeft.isBusy() || foreRight.isBusy() || backLeft.isBusy() || backRight.isBusy()){}
 
         return true;
+    }
+
+    public boolean dtIsBusy(){
+        if(foreLeft.isBusy() || foreRight.isBusy() || backRight.isBusy() || backLeft.isBusy()){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    int[] thinkgs = new int[4];
+    public int postitionsBL() {
+        return backLeft.getCurrentPosition();
+    }
+    public int postitionsBR() {
+        return backRight.getCurrentPosition();
+    }
+
+    public double getBLPower(){
+        return backLeft.getPower();
     }
 }
