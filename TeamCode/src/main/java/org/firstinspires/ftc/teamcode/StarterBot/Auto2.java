@@ -286,7 +286,7 @@ public class Auto2 extends OpMode{
                  * the robot has been within a tolerance of the target position for "holdSeconds."
                  * Once the function returns "true" we reset the encoders again and move on.
                  */
-                if(dt.tankDrive(DRIVE_SPEED, 40, DistanceUnit.INCH)){
+                if(dt.tankDrive(DRIVE_SPEED, 20, DistanceUnit.INCH)){
                     dt.stop();
                 }
                 break;

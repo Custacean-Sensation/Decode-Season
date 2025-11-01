@@ -21,8 +21,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.ExampleDrivetrain;
 
-@Autonomous(name="StarterBotAuto")
-public class Auto1 extends OpMode{
+@Autonomous(name="OffCenterGoalStart")
+public class CyberSteelAuto extends OpMode{
     final double FEED_TIME = 0.25; //The feeder servos run this long when a shot is requested.
 
     /*
@@ -230,7 +230,7 @@ public class Auto1 extends OpMode{
          */
         switch (autonomousState){
             case AWAY:
-                if(dt.tankDrive(DRIVE_SPEED, 40, DistanceUnit.INCH)){
+                if(dt.tankDrive(DRIVE_SPEED, 31, DistanceUnit.INCH)){
                     dt.stop();
                 }
 
@@ -268,23 +268,11 @@ public class Auto1 extends OpMode{
                     } else {
                         dt.resetEncoders();
                         launcher.setVelocity(0);
-                        autonomousState = AutonomousState.DRIVING_AWAY_FROM_GOAL;
+                        autonomousState = AutonomousState.DONE;
                     }
                 }
                 break;
 
-            case DRIVING_AWAY_FROM_GOAL:
-                /*
-                 * This is another function that returns a boolean. This time we return "true" if
-                 * the robot has been within a tolerance of the target position for "holdSeconds."
-                 * Once the function returns "true" we reset the encoders again and move on.
-                 */
-                if(dt.tankDrive(DRIVE_SPEED, 20, DistanceUnit.INCH)) {
-
-                    dt.resetEncoders();
-                    autonomousState = AutonomousState.DONE;
-                    break;
-                }
             case DONE:
                 break;
         }
