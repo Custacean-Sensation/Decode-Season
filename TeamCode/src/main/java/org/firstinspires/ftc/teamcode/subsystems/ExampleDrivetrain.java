@@ -1,6 +1,5 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.subsystems;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 import static java.lang.Thread.sleep;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -177,5 +176,17 @@ public class ExampleDrivetrain
 
     public double getBLPower(){
         return backLeft.getPower();
+    }
+
+    public void mecanumDrive(double lateral, double axial, double yaw) {
+        yaw = -yaw;
+        lateral = -lateral;
+        axial = -axial;
+        double foreLeftPower = (lateral + axial) + yaw;
+        double foreRightPower = (lateral - axial) - yaw;
+        double backLeftPower = (lateral - axial) + yaw;
+        double backRightPower = (lateral + axial) - yaw;
+
+        setPowers(foreLeftPower, foreRightPower, backLeftPower, backRightPower);
     }
 }

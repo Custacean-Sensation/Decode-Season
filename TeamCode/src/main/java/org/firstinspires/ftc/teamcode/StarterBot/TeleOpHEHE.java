@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.ExampleDrivetrain;
+import org.firstinspires.ftc.teamcode.subsystems.ExampleDrivetrain;
 
 @TeleOp(name = "StarterBotTeleop")
 public class TeleOpHEHE extends OpMode {
