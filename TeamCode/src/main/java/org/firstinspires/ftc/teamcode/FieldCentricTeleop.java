@@ -18,10 +18,10 @@ public class FieldCentricTeleop extends OpMode {
     @Override
     public void init() {
         // Drive motors
-        fl = hardwareMap.get(DcMotor.class, "frontLeft");
-        fr = hardwareMap.get(DcMotor.class, "frontRight");
-        bl = hardwareMap.get(DcMotor.class, "backLeft");
-        br = hardwareMap.get(DcMotor.class, "backRight");
+        fl = hardwareMap.get(DcMotor.class, "LeftFront");
+        fr = hardwareMap.get(DcMotor.class, "RightFront");
+        bl = hardwareMap.get(DcMotor.class, "LeftBack");
+        br = hardwareMap.get(DcMotor.class, "RightBack");
 
         // Adjust directions to match your robot
         fl.setDirection(DcMotorSimple.Direction.REVERSE);
