@@ -8,13 +8,15 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.GoBildaPinpointDriver;
 
 public class ExampleDrivetrain
 {
-    private final DcMotor foreLeft;
-    private final DcMotor foreRight;
-    private final DcMotor backLeft;
-    private final DcMotor backRight;
+    private DcMotor foreLeft;
+    private DcMotor foreRight;
+    private DcMotor backLeft;
+    private DcMotor backRight;
+    private GoBildaPinpointDriver pinpoint;
     private final double DRIVE_SPEED = 0.5;
     private final double ROTATE_SPEED = 0.2;
     private final double WHEEL_DIAMETER_MM = 96;
@@ -34,11 +36,60 @@ public class ExampleDrivetrain
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setDirection(DcMotorSimple.Direction.FORWARD);
 
+        foreLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        foreRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         foreLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         foreRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
+
+    public ExampleDrivetrain(HardwareMap hw, String fl, String fr, String bl, String br, String pp)
+    {
+        foreLeft = hw.get(DcMotor.class, fl);
+        foreRight = hw.get(DcMotor.class, fr);
+        backLeft = hw.get(DcMotor.class, bl);
+        backRight = hw.get(DcMotor.class, br);
+
+        foreLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        foreRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        backRight.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        foreLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        foreRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        foreLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        foreRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        //set pinpoint values and data
+        pinpoint = hw.get(GoBildaPinpointDriver.class, "pinpoint");
+
+        pinpoint.setEncoderResolution(
+                GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD
+        );
+
+        pinpoint.setEncoderDirections(
+                GoBildaPinpointDriver.EncoderDirection.FORWARD, //x pod
+                GoBildaPinpointDriver.EncoderDirection.FORWARD //y pod
+        );
+
+        //offsets
+        pinpoint.setOffsets(
+                0.0, // x offset
+                0.0 //y offset
+        );
+
+        pinpoint.resetPosAndIMU();
+    }
+
 
     //raw power inputs
     public void setPowers(double fl, double fr, double bl, double br)
@@ -188,5 +239,42 @@ public class ExampleDrivetrain
         double backRightPower = (lateral + axial) - yaw;
 
         setPowers(foreLeftPower, foreRightPower, backLeftPower, backRightPower);
+    }
+
+    public void fieldCentricDrive(double y, double x, double turn) {
+        double deadzone = 0.03;
+        if (Math.abs(x) < deadzone) x = 0;
+        if (Math.abs(y) < deadzone) y = 0;
+        if (Math.abs(turn) < deadzone) turn = 0;
+
+        pinpoint.update(GoBildaPinpointDriver.ReadData.ONLY_UPDATE_HEADING);
+        double heading = pinpoint.getHeading(AngleUnit.RADIANS);
+
+        //field centric maths
+        double cosH = Math.cos(-heading);
+        double sinH = Math.sin(-heading);
+
+        double rotX = x * cosH - y * sinH;
+        double rotY = x * sinH + y * cosH;
+
+        //mecanum drive math stuff
+        double flPower = rotY + rotX + turn;
+        double frPower = rotY - rotX - turn;
+        double blPower = rotY - rotX + turn;
+        double brPower = rotY + rotX - turn;
+
+        //normalize powers
+        double max = Math.max(
+                1.0, Math.max(
+                        Math.abs(flPower),
+                        Math.max(Math.abs(frPower),
+                                Math.max(Math.abs(blPower), Math.abs(brPower)))
+                )
+        );
+
+        foreLeft.setPower(flPower / max);
+        foreRight.setPower(frPower / max);
+        backLeft.setPower(blPower / max);
+        backRight.setPower(brPower / max);
     }
 }

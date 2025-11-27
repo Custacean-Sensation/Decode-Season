@@ -18,10 +18,10 @@ public class FieldCentricTeleop extends OpMode {
     @Override
     public void init() {
         // Drive motors
-        fl = hardwareMap.get(DcMotor.class, "LeftFront");
-        fr = hardwareMap.get(DcMotor.class, "RightFront");
-        bl = hardwareMap.get(DcMotor.class, "LeftBack");
-        br = hardwareMap.get(DcMotor.class, "RightBack");
+        fl = hardwareMap.get(DcMotor.class, "frontLeft");
+        fr = hardwareMap.get(DcMotor.class, "frontRight");
+        bl = hardwareMap.get(DcMotor.class, "backLeft");
+        br = hardwareMap.get(DcMotor.class, "backRight");
 
         // Adjust directions to match your robot
         fl.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -41,7 +41,7 @@ public class FieldCentricTeleop extends OpMode {
 
         // Use built-in pod constants if you're using goBILDA pods
         pinpoint.setEncoderResolution(
-                GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD
+                GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD
                 // or GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD
         );
 
@@ -76,7 +76,7 @@ public class FieldCentricTeleop extends OpMode {
     @Override
     public void loop() {
         // ---- DRIVER INPUTS ----
-        double y = -gamepad1.left_stick_y;   // forward/back
+        double y = gamepad1.left_stick_y;   // forward/back
         double x = gamepad1.left_stick_x;    // strafe
         double turn = gamepad1.right_stick_x; // rotation
 
