@@ -77,8 +77,8 @@ public class FieldCentricTeleop extends OpMode {
     public void loop() {
         // ---- DRIVER INPUTS ----
         double y = gamepad1.left_stick_y;   // forward/back
-        double x = gamepad1.left_stick_x;    // strafe
-        double turn = gamepad1.right_stick_x; // rotation
+        double x = -gamepad1.left_stick_x;    // strafe
+        double turn = -gamepad1.right_stick_x; // rotation
 
         // Optional: small deadzone
         double deadzone = 0.03;
@@ -121,6 +121,10 @@ public class FieldCentricTeleop extends OpMode {
         bl.setPower(blPower / max);
         br.setPower(brPower / max);
 
+        //button controls
+        if (gamepad1.dpad_up) {
+            pinpoint.resetPosAndIMU();
+        }
         // ---- TELEMETRY ----
         double headingDeg = heading * 180.0 / Math.PI;
         telemetry.addData("Heading (rad)", heading);
