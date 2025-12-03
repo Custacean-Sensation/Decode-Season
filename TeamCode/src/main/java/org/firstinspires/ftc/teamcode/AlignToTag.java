@@ -2,9 +2,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
+import org.firstinspires.ftc.teamcode.subsystems.ExampleDrivetrain;
 
 /**
  * AlignToTag
@@ -16,8 +16,8 @@ import com.qualcomm.robotcore.util.Range;
 @TeleOp(name="AlignToTag", group="drive")
 public class AlignToTag extends OpMode {
 
-    // Motors
-    private DcMotorEx lf, rf, lb, rb;
+    // Drivetrain subsystem
+    private ExampleDrivetrain dt;
 
     // Limelight client (HTTP JSON). Change host/IP to your camera.
     private LimelightClient limelight;
@@ -29,22 +29,8 @@ public class AlignToTag extends OpMode {
 
     @Override
     public void init() {
-        lf = hardwareMap.get(DcMotorEx.class, "lf");
-        rf = hardwareMap.get(DcMotorEx.class, "rf");
-        lb = hardwareMap.get(DcMotorEx.class, "lb");
-        rb = hardwareMap.get(DcMotorEx.class, "rb");
-
-        // Typical directions for mecanum; flip if your robot spins the wrong way.
-        lf.setDirection(DcMotorSimple.Direction.REVERSE);
-        lb.setDirection(DcMotorSimple.Direction.REVERSE);
-        rf.setDirection(DcMotorSimple.Direction.FORWARD);
-        rb.setDirection(DcMotorSimple.Direction.FORWARD);
-
-        // Coast is fine here; use BRAKE if you want it to stop harder.
-        lf.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        rf.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        lb.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        rb.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        // Initialize drivetrain subsystem using configured motor names
+        dt = new ExampleDrivetrain(hardwareMap, "lf", "rf", "lb", "rb");
 
         // Point this at your Limelight. If mDNS isn’t reliable, use the IP.
         limelight = new LimelightClient("http://limelight.local:5807");
@@ -78,8 +64,10 @@ public class AlignToTag extends OpMode {
             turnCmd = 0.0;
         }
 
-        // Rotate in place: left +turn, right -turn
-        setDrivePower(+turnCmd, -turnCmd, +turnCmd, -turnCmd);
+        // Rotate in place via drivetrain subsystem. ExampleDrivetrain.mecanumDrive
+        // expects (lateral, axial, yaw). To produce left=+turn, right=-turn we pass
+        // yaw = -turnCmd (the method negates yaw internally), so use -turnCmd here.
+        dt.mecanumDrive(0.0, 0.0, -turnCmd);
 
         // Telemetry — no fluff, just what matters
         telemetry.addData("Aligning (hold A)", aligning);
@@ -94,10 +82,5 @@ public class AlignToTag extends OpMode {
         telemetry.update();
     }
 
-    private void setDrivePower(double lfp, double rfp, double lbp, double rbp) {
-        lf.setPower(lfp);
-        rf.setPower(rfp);
-        lb.setPower(lbp);
-        rb.setPower(rbp);
-    }
+    // drive control handled by ExampleDrivetrain
 }
