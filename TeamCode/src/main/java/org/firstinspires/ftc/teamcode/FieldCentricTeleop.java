@@ -108,7 +108,7 @@ public class FieldCentricTeleop extends OpMode {
 
         // Normalize so max magnitude = 1
         double max = Math.max(
-                1.0,
+                1,
                 Math.max(
                         Math.abs(flPower),
                         Math.max(Math.abs(frPower),
