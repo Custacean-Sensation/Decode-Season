@@ -11,11 +11,13 @@ import org.firstinspires.ftc.teamcode.subsystems.ExampleDrivetrain;
 public class Q3Teleop extends OpMode {
     GoBildaPinpointDriver pinpoint;
     ExampleDrivetrain dt;
+    Intake intake;
     @Override
     public void init() {
         //set up drivetrain and motors and servos
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         dt = new ExampleDrivetrain(hardwareMap, "frontLeft", "frontRight", "backLeft", "backRight", "pinpoint");
+        intake = new Intake(hardwareMap, "intakeMotor", "leftFeed", "rightFeed");
 
     }
 
@@ -29,7 +31,16 @@ public class Q3Teleop extends OpMode {
         dt.fieldCentricDrive(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
 
         if (gamepad1.left_stick_button && gamepad1.right_stick_button) {
-            pinpoint.resetPosAndIMU();
+            pinpoint.resetPosAndIMU();   
+        }
+        if (gamepad1.a) {
+            intake.start();
+        } 
+        if (gamepad1.b) {
+            intake.reverse();
+        } 
+        if (gamepad1.x) {
+            intake.stop();
         }
     }
 
