@@ -8,12 +8,18 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.OutakeSystem;
 
 @TeleOp(name = "FieldCentricTeleOp_Pinpoint")
 public class FieldCentricTeleop extends OpMode {
 
     private DcMotor fl, fr, bl, br;
     private GoBildaPinpointDriver pinpoint;
+
+    private Intake intake;
+
+    private OutakeSystem outake;
 
     @Override
     public void init() {
@@ -65,6 +71,11 @@ public class FieldCentricTeleop extends OpMode {
 
         telemetry.addLine("Initialized – Pinpoint configured");
         telemetry.update();
+
+        intake = new Intake(hardwareMap, "intake");
+
+        outake = new OutakeSystem(hardwareMap, "launcher", "leftFeeder", "rightFeeder");
+
     }
 
     @Override
@@ -121,10 +132,7 @@ public class FieldCentricTeleop extends OpMode {
         bl.setPower(blPower / max);
         br.setPower(brPower / max);
 
-        //button controls
-        if (gamepad1.dpad_up) {
-            pinpoint.resetPosAndIMU();
-        }
+
         // ---- TELEMETRY ----
         double headingDeg = heading * 180.0 / Math.PI;
         telemetry.addData("Heading (rad)", heading);

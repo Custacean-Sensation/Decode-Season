@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+import java.util.Arrays;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -8,12 +8,15 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.subsystems.ExampleDrivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.OutakeSystem;
 
 @TeleOp(name = "Q3 Teleop")
 public class Q3Teleop extends OpMode {
     GoBildaPinpointDriver pinpoint;
     ExampleDrivetrain dt;
     Intake intake;
+
+    OutakeSystem outake;
 
     //limelight stuff
     private LimelightClient limelight;
@@ -27,10 +30,12 @@ public class Q3Teleop extends OpMode {
         //set up drivetrain and motors and servos
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         dt = new ExampleDrivetrain(hardwareMap, "frontLeft", "frontRight", "backLeft", "backRight", "pinpoint");
-        intake = new Intake(hardwareMap, "intakeMotor", "leftFeed", "rightFeed");
+        // Intake API changed: constructor now only needs the intake motor name
+        intake = new Intake(hardwareMap, "intakeMotor");
+        outake = new OutakeSystem(hardwareMap, "launcher", "leftFeeder", "rightFeeder");
 
-        //limelight
-        limelight = new LimelightClient("http//limeligh.local:5807");
+        //limelight (fixed URL typo)
+        limelight = new LimelightClient("http://limelight.local:5807");
         telemetry.addLine("Limelight connection complete");
         telemetry.update();
 
@@ -48,15 +53,35 @@ public class Q3Teleop extends OpMode {
         if (gamepad1.left_stick_button && gamepad1.right_stick_button) {
             pinpoint.resetPosAndIMU();   
         }
-        if (gamepad1.a) {
+        //intake control
+        if (gamepad1.right_trigger > 0.1) {
             intake.start();
-        } 
-        if (gamepad1.b) {
+        } else if (gamepad1.left_trigger > 0.1) {
             intake.reverse();
-        } 
-        if (gamepad1.x) {
+        } else {
             intake.stop();
         }
+
+        //outake control
+        if (gamepad1.right_bumper){
+            outake.requestShot();
+        }
+        if (gamepad1.dpad_down){
+            outake.stopLauncher();
+        }
+
+        if (gamepad1.dpad_up) {
+            // Spin up the launcher but do NOT advance feeders automatically.
+            outake.spinUpLauncher();
+        }
+        if (gamepad1.dpad_left){
+            outake.reverseFeedPulse();
+        }
+        if (gamepad1.dpad_right) {
+            outake.manualFeedPulse();
+        }
+
+        outake.update();
 
         //allign to tag
         limelight.update();
@@ -64,6 +89,16 @@ public class Q3Teleop extends OpMode {
         double tx = limelight.getTx();
         double ty = limelight.getTy();
         double[] botpose = limelight.getBotpose(); //[x, y, z, roll, pitch, yaw]
+
+        // Telemetry to make use of limelight values and aid debugging
+        telemetry.addData("limelight/hasTarget", hasTarget);
+        telemetry.addData("limelight/tx", tx);
+        telemetry.addData("limelight/ty", ty);
+        if (botpose != null) telemetry.addData("limelight/botpose", Arrays.toString(botpose));
+
+        // Advance the outake state machine every loop so spin-up and timed feeds work
+        outake.update();
+        telemetry.addData("launcherVel", outake.getLauncherVelocity());
 
         double turnCmd = 0.0;
         boolean aligning = gamepad1.left_bumper; //hold left_bumper to align
@@ -78,9 +113,9 @@ public class Q3Teleop extends OpMode {
         }
         //end allign to tag
 
+        telemetry.update();
 
     }
-
 
 
 }
