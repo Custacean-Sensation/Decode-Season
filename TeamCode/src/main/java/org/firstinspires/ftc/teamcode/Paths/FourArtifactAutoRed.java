@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Paths;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.subsystems.OutakeSystem;
 
 @Autonomous(name = "FourArtifactAutoRed", group = "Autonomous")
 @Configurable // Panels
-public class PedroAutonomous extends OpMode {
+public class FourArtifactAutoRed extends OpMode {
 
   private TelemetryManager panelsTelemetry; // Panels Telemetry instance
   public Follower follower; // Pedro Pathing follower instance
@@ -58,14 +58,14 @@ public class PedroAutonomous extends OpMode {
 
   public static class Paths {
 
-    public PathChain FirstLaunch;
-    public PathChain PrepforGrab;
-    public PathChain Grab;
-    public PathChain PrepforLaunch;
-    public PathChain SecondLaunch;
+    public PathChain firstLaunch;
+    public PathChain prepForGrab;
+    public PathChain grab;
+    public PathChain prepForLaunch;
+    public PathChain secondLaunch;
 
-    public Paths(Follower follower) {
-      FirstLaunch = follower
+      public Paths(Follower follower) {
+      firstLaunch = follower
         .pathBuilder()
         .addPath(
           new BezierLine(new Pose(121.924, 123.139), new Pose(103.291, 102.278))
@@ -73,7 +73,7 @@ public class PedroAutonomous extends OpMode {
         .setConstantHeadingInterpolation(Math.toRadians(45))
         .build();
 
-      PrepforGrab = follower
+      prepForGrab = follower
         .pathBuilder()
         .addPath(
           new BezierCurve(
@@ -85,7 +85,7 @@ public class PedroAutonomous extends OpMode {
         .setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(180))
         .build();
 
-      Grab = follower
+      grab = follower
         .pathBuilder()
         .addPath(
           new BezierLine(new Pose(103.291, 83.241), new Pose(124.962, 83.443))
@@ -93,7 +93,7 @@ public class PedroAutonomous extends OpMode {
         .setConstantHeadingInterpolation(Math.toRadians(180))
         .build();
 
-      PrepforLaunch = follower
+      prepForLaunch = follower
         .pathBuilder()
         .addPath(
           new BezierLine(new Pose(124.962, 83.443), new Pose(103.291, 83.241))
@@ -101,7 +101,7 @@ public class PedroAutonomous extends OpMode {
         .setConstantHeadingInterpolation(Math.toRadians(180))
         .build();
 
-      SecondLaunch = follower
+      secondLaunch = follower
         .pathBuilder()
         .addPath(
           new BezierLine(new Pose(103.291, 83.241), new Pose(103.291, 102.278))
