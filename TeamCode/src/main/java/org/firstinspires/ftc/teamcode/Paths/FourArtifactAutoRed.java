@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Paths;
+package org.firstinspires.ftc.teamcode;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
@@ -16,14 +16,14 @@ import org.firstinspires.ftc.teamcode.subsystems.OutakeSystem;
 
 @Autonomous(name = "FourArtifactAutoRed", group = "Autonomous")
 @Configurable // Panels
-public class FourArtifactAutoRed extends OpMode {
+public class PedroAutonomous extends OpMode {
 
   private TelemetryManager panelsTelemetry; // Panels Telemetry instance
   public Follower follower; // Pedro Pathing follower instance
   private int pathState; // Current autonomous path state (state machine)
   private Paths paths; // Paths defined in the Paths class
-  private static Intake intake;
-  private static OutakeSystem outake;
+  Intake intake;
+  OutakeSystem outake;
 
   @Override
   public void init() {
@@ -39,6 +39,8 @@ public class FourArtifactAutoRed extends OpMode {
 
     intake = new Intake(hardwareMap, "intake");
     outake = new OutakeSystem(hardwareMap, "launcher", "leftFeeder", "rightFeeder");
+
+    pathState = 0;
   }
 
   @Override
@@ -70,10 +72,6 @@ public class FourArtifactAutoRed extends OpMode {
         )
         .setConstantHeadingInterpolation(Math.toRadians(45))
         .build();
-        intake.start();
-        outake.requestShot();
-        outake.requestShot();
-        outake.stopLauncher();
 
       PrepforGrab = follower
         .pathBuilder()
@@ -94,7 +92,6 @@ public class FourArtifactAutoRed extends OpMode {
         )
         .setConstantHeadingInterpolation(Math.toRadians(180))
         .build();
-        intake.stop();
 
       PrepforLaunch = follower
         .pathBuilder()
@@ -111,18 +108,63 @@ public class FourArtifactAutoRed extends OpMode {
         )
         .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(45))
         .build();
-        intake.start();
-        outake.requestShot();
-        outake.requestShot();
-        intake.stop();
-        outake.stopLauncher();
     }
   }
 
   public int autonomousPathUpdate() {
-    // Add your state machine Here
-    // Access paths with paths.pathName
-    // Refer to the Pedro Pathing Docs (Auto Example) for an example state machine
-    return pathState;
+  
+      switch (pathState) {
+  
+          case 0:
+              follower.followPath(paths.firstLaunch);
+              intake.start();
+              outake.requestShot();
+              outake.requestShot();
+              pathState++;
+              break;
+  
+          case 1:
+              if (!follower.isBusy()) {
+                  outake.stopLauncher();
+                  follower.followPath(paths.prepForGrab);
+                  pathState++;
+              }
+              break;
+  
+          case 2:
+              if (!follower.isBusy()) {
+                  follower.followPath(paths.grab);
+                  pathState++;
+              }
+              break;
+  
+          case 3:
+              if (!follower.isBusy()) {
+                  intake.stop();
+                  follower.followPath(paths.prepForLaunch);
+                  pathState++;
+              }
+              break;
+  
+          case 4:
+              if (!follower.isBusy()) {
+                  follower.followPath(paths.secondLaunch);
+                  intake.start();
+                  outake.requestShot();
+                  outake.requestShot();
+                  pathState++;
+              }
+              break;
+  
+          case 5:
+              if (!follower.isBusy()) {
+                  intake.stop();
+                  outake.stopLauncher();
+                  // Autonomous complete
+              }
+              break;
+      }
+  
+      return pathState;
   }
 }
