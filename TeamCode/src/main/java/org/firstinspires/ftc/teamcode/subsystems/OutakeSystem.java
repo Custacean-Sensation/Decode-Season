@@ -27,7 +27,7 @@ public class OutakeSystem {
     private static final double FEED_TIME_SECONDS = 0.20;
     private static final double STOP_SPEED = 0.0;
     private static final double FULL_SPEED = 1.0;
-    private static final double LAUNCHER_TARGET_VELOCITY = 1125 * 1.25;
+    private static final double LAUNCHER_TARGET_VELOCITY = 1125 * 1.5;
     private static final double LAUNCHER_MIN_VELOCITY = 1075;
 
     // When true, reaching the target velocity will automatically advance feeders.
@@ -50,7 +50,8 @@ public class OutakeSystem {
 
         leftFeeder.setPower(STOP_SPEED);
         rightFeeder.setPower(STOP_SPEED);
-        leftFeeder.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftFeeder.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightFeeder.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void setLauncherVelocity(double velocity) {
