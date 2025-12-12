@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Paths;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
@@ -14,16 +14,16 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.OutakeSystem;
 
-@Autonomous(name = "Pedro Pathing Autonomous", group = "Autonomous")
+@Autonomous(name = "FourArtifactAutoRed", group = "Autonomous")
 @Configurable // Panels
-public class PedroAutonomous extends OpMode {
+public class FourArtifactAutoRed extends OpMode {
 
   private TelemetryManager panelsTelemetry; // Panels Telemetry instance
   public Follower follower; // Pedro Pathing follower instance
   private int pathState; // Current autonomous path state (state machine)
   private Paths paths; // Paths defined in the Paths class
-  Intake intake;
-  OutakeSystem outake;
+  private static Intake intake;
+  private static OutakeSystem outake;
 
   @Override
   public void init() {
@@ -70,10 +70,10 @@ public class PedroAutonomous extends OpMode {
         )
         .setConstantHeadingInterpolation(Math.toRadians(45))
         .build();
-      intake.start();
-      outake.requestShot();
-      outake.requestShot();
-      outake.stopLauncher();
+        intake.start();
+        outake.requestShot();
+        outake.requestShot();
+        outake.stopLauncher();
 
       PrepforGrab = follower
         .pathBuilder()
@@ -94,7 +94,7 @@ public class PedroAutonomous extends OpMode {
         )
         .setConstantHeadingInterpolation(Math.toRadians(180))
         .build();
-      intake.stop();
+        intake.stop();
 
       PrepforLaunch = follower
         .pathBuilder()
@@ -111,11 +111,11 @@ public class PedroAutonomous extends OpMode {
         )
         .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(45))
         .build();
-      intake.start();
-      outake.requestShot();
-      outake.requestShot();
-      intake.stop();
-      outake.stopLauncher();
+        intake.start();
+        outake.requestShot();
+        outake.requestShot();
+        intake.stop();
+        outake.stopLauncher();
     }
   }
 
