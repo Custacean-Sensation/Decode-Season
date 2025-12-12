@@ -23,7 +23,6 @@ public class PedroAutonomous extends OpMode {
   private int pathState; // Current autonomous path state (state machine)
   private Paths paths; // Paths defined in the Paths class
   Intake intake;
-
   OutakeSystem outake;
 
   @Override
@@ -61,7 +60,7 @@ public class PedroAutonomous extends OpMode {
     public PathChain PrepforGrab;
     public PathChain Grab;
     public PathChain PrepforLaunch;
-    public PathChain SecondLaunh;
+    public PathChain SecondLaunch;
 
     public Paths(Follower follower) {
       FirstLaunch = follower
@@ -95,6 +94,7 @@ public class PedroAutonomous extends OpMode {
         )
         .setConstantHeadingInterpolation(Math.toRadians(180))
         .build();
+      intake.stop();
 
       PrepforLaunch = follower
         .pathBuilder()
@@ -104,13 +104,14 @@ public class PedroAutonomous extends OpMode {
         .setConstantHeadingInterpolation(Math.toRadians(180))
         .build();
 
-      SecondLaunh = follower
+      SecondLaunch = follower
         .pathBuilder()
         .addPath(
           new BezierLine(new Pose(103.291, 83.241), new Pose(103.291, 102.278))
         )
         .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(45))
         .build();
+      intake.start();
       outake.requestShot();
       outake.requestShot();
       intake.stop();
