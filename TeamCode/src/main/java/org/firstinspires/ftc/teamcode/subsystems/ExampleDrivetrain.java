@@ -258,10 +258,10 @@ public class ExampleDrivetrain
         double rotY = x * sinH + y * cosH;
 
         //mecanum drive math stuff
-        double flPower = rotY - rotX - turn;
-        double frPower = rotY + rotX + turn;
-        double blPower = rotY + rotX - turn;
-        double brPower = rotY - rotX + turn;
+        double flPower = rotY + rotX + turn;
+        double frPower = rotY - rotX - turn;
+        double blPower = rotY - rotX + turn;
+        double brPower = rotY + rotX - turn;
 
         //normalize powers
         double max = Math.max(
