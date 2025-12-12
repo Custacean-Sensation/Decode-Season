@@ -11,6 +11,8 @@ import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.OutakeSystem;
 
 @Autonomous(name = "Pedro Pathing Autonomous", group = "Autonomous")
 @Configurable // Panels
@@ -20,6 +22,9 @@ public class PedroAutonomous extends OpMode {
   public Follower follower; // Pedro Pathing follower instance
   private int pathState; // Current autonomous path state (state machine)
   private Paths paths; // Paths defined in the Paths class
+  Intake intake;
+
+  OutakeSystem outake;
 
   @Override
   public void init() {
@@ -32,6 +37,9 @@ public class PedroAutonomous extends OpMode {
 
     panelsTelemetry.debug("Status", "Initialized");
     panelsTelemetry.update(telemetry);
+
+    intake = new Intake(hardwareMap, "intake");
+    outake = new OutakeSystem(hardwareMap, "launcher", "leftFeeder", "rightFeeder");
   }
 
   @Override
@@ -63,6 +71,10 @@ public class PedroAutonomous extends OpMode {
         )
         .setConstantHeadingInterpolation(Math.toRadians(45))
         .build();
+      intake.start();
+      outake.requestShot();
+      outake.requestShot();
+      outake.stopLauncher();
 
       PrepforGrab = follower
         .pathBuilder()
@@ -99,6 +111,10 @@ public class PedroAutonomous extends OpMode {
         )
         .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(45))
         .build();
+      outake.requestShot();
+      outake.requestShot();
+      intake.stop();
+      outake.stopLauncher();
     }
   }
 
