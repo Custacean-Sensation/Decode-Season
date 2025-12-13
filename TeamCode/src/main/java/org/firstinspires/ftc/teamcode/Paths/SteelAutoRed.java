@@ -83,7 +83,7 @@ public class SteelAutoRed extends OpMode {
             this.follower = follower;
 
             // Define poses once (no magic numbers scattered around)
-            START = new Pose(83, 12, Math.toRadians(90));
+            START = new Pose(83, 8, Math.toRadians(90));
             LAUNCH = new Pose(85.5, 89, Math.toRadians(45));
             END = new Pose(83, 20, Math.toRadians(180));
 
@@ -136,13 +136,13 @@ public class SteelAutoRed extends OpMode {
                 if (!follower.isBusy()) {
                     intake.stop();
                     outake.stopLauncher();
-                    pathState = 3;
+                    pathState++;
                 }
                 break;
             case 3:
                 if(!follower.isBusy()){
                     follower.followPath(paths.grab);
-                    pathState = 4;
+                    pathState++;
                 }
             case 4:
                 if(!follower.isBusy()){

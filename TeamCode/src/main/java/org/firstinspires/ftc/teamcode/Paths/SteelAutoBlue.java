@@ -83,8 +83,8 @@ public class SteelAutoBlue extends OpMode {
             this.follower = follower;
 
             // Define poses once (no magic numbers scattered around)
-            START = new Pose(61, 14, Math.toRadians(90));
-            LAUNCH = new Pose(62, 89, Math.toRadians(135));
+            START = new Pose(61, 8, Math.toRadians(90));
+            LAUNCH = new Pose(62, 87, Math.toRadians(135));
             END = new Pose(62, 20, Math.toRadians(180));
 
             buildPaths();
@@ -127,7 +127,6 @@ public class SteelAutoBlue extends OpMode {
                     while(outake.isLaunching()){outake.update(); panelsTelemetry.addData("launching?", outake.isLaunching()); panelsTelemetry.update();}
                     outake.requestShot();
                     while(outake.isLaunching()){outake.update(); panelsTelemetry.addData("launching?", outake.isLaunching()); panelsTelemetry.update();}
-                    follower.followPath(paths.prepForGrab);
                     pathState++;
                 }
                 break;
@@ -136,13 +135,13 @@ public class SteelAutoBlue extends OpMode {
                 if (!follower.isBusy()) {
                     intake.stop();
                     outake.stopLauncher();
-                    pathState = 3;
+                    pathState++;
                 }
                 break;
             case 3:
                 if(!follower.isBusy()){
                     follower.followPath(paths.grab);
-                    pathState = 4;
+                    pathState++;
                 }
             case 4:
                 if(!follower.isBusy()){
