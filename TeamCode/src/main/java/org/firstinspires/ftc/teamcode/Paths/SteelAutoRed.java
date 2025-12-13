@@ -15,9 +15,9 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.OutakeSystem;
 
-@Autonomous(name = "steelAutoBlue", group = "Autonomous")
+@Autonomous(name = "steelAutoRed", group = "Autonomous")
 @Configurable
-public class SteelAutoBlue extends OpMode {
+public class SteelAutoRed extends OpMode {
 
     private TelemetryManager panelsTelemetry;
     public Follower follower;
@@ -83,9 +83,9 @@ public class SteelAutoBlue extends OpMode {
             this.follower = follower;
 
             // Define poses once (no magic numbers scattered around)
-            START = new Pose(61, 14, Math.toRadians(90));
-            LAUNCH = new Pose(62, 89, Math.toRadians(135));
-            END = new Pose(62, 20, Math.toRadians(180));
+            START = new Pose(83, 12, Math.toRadians(90));
+            LAUNCH = new Pose(85.5, 89, Math.toRadians(45));
+            END = new Pose(83, 20, Math.toRadians(180));
 
             buildPaths();
         }
