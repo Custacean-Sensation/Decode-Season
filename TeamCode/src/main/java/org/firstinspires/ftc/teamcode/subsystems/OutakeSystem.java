@@ -34,6 +34,7 @@ public class OutakeSystem {
     // When false, the launcher will spin up but will not advance balls until a
     // manual requestShot() is issued.
     private boolean autoLaunchEnabled = true;
+    private boolean launching = false;
 
     public OutakeSystem(HardwareMap hardwareMap,
                         String launcherName,
@@ -66,6 +67,7 @@ public class OutakeSystem {
         // When explicitly requesting a shot we enable auto-launch so the state
         // machine will progress from SPIN_UP -> LAUNCH automatically once up to speed.
         autoLaunchEnabled = true;
+        launching = true;
         if (launchState == LaunchState.IDLE) {
             launchState = LaunchState.SPIN_UP;
         }
@@ -126,6 +128,10 @@ public class OutakeSystem {
         launchState = LaunchState.IDLE;
     }
 
+    public boolean isLaunching(){
+        return launching;
+    }
+
     public void update() {
         switch (launchState) {
             case IDLE:
@@ -149,6 +155,7 @@ public class OutakeSystem {
                 if (feederTimer.seconds() > FEED_TIME_SECONDS) {
                     leftFeeder.setPower(STOP_SPEED);
                     rightFeeder.setPower(STOP_SPEED);
+                    launching = false;
                     launchState = LaunchState.IDLE;
                 }
                 break;

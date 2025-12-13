@@ -25,7 +25,7 @@ public class Q3Teleop extends OpMode {
     //turning control for limelight
     private static final double KP_TURN = 0.03;
     private static final double MAX_TURN = 0.35; //cap turn power
-    private static final double TX_DEADBAND = 0.5; //degrees for the good enought window
+    private static final double TX_DEADBAND = 5; //degrees for the good enought window
 
 
     @Override
