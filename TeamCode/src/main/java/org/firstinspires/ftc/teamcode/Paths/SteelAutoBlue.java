@@ -70,6 +70,7 @@ public class SteelAutoBlue extends OpMode {
         // ---- Pose variables ----
         public final Pose START;
         public final Pose LAUNCH;
+        public final Pose END;
 
         // ---- Each segment is its own path object (PathChain of 1 path) ----
         public PathChain firstLaunch;
@@ -82,8 +83,9 @@ public class SteelAutoBlue extends OpMode {
             this.follower = follower;
 
             // Define poses once (no magic numbers scattered around)
-            START = new Pose(83, 11, Math.toRadians(90));
-            LAUNCH = new Pose(89, 88, Math.toRadians(135));
+            START = new Pose(61, 14, Math.toRadians(90));
+            LAUNCH = new Pose(62, 89, Math.toRadians(135));
+            END = new Pose(62, 40, Math.toRadians(180));
 
             buildPaths();
         }
@@ -97,6 +99,13 @@ public class SteelAutoBlue extends OpMode {
                             )
                     )
                     .setLinearHeadingInterpolation(START.getHeading(), LAUNCH.getHeading())
+                    .build();
+
+            grab = follower.pathBuilder()
+                    .addPath(new Path(
+                            new BezierLine(LAUNCH, END)
+                    ))
+                    .setLinearHeadingInterpolation(LAUNCH.getHeading(), END.getHeading())
                     .build();
         }
     }
@@ -127,9 +136,19 @@ public class SteelAutoBlue extends OpMode {
                 if (!follower.isBusy()) {
                     intake.stop();
                     outake.stopLauncher();
-                    pathState = -1;
+                    pathState = 3;
                 }
                 break;
+            case 3:
+                if(!follower.isBusy()){
+                    follower.followPath(paths.grab);
+                    pathState = 4;
+                }
+            case 4:
+                if(!follower.isBusy()){
+                    pathState = -1;
+                }
+
         }
 
         return pathState;
