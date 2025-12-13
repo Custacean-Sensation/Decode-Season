@@ -30,7 +30,7 @@ public class FourArtifactAutoRed extends OpMode {
     panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
     follower = Constants.createFollower(hardwareMap);
-    follower.setStartingPose(new Pose(72, 8, Math.toRadians(90)));
+    follower.setStartingPose(new Pose(121.924, 123.139, Math.toRadians(45)));
 
     paths = new Paths(follower); // Build paths
 
@@ -119,13 +119,12 @@ public class FourArtifactAutoRed extends OpMode {
               follower.followPath(paths.firstLaunch);
               intake.start();
               outake.requestShot();
-              outake.requestShot();
               pathState++;
               break;
   
           case 1:
               if (!follower.isBusy()) {
-                  outake.stopLauncher();
+                  outake.requestShot();
                   follower.followPath(paths.prepForGrab);
                   pathState++;
               }
@@ -133,6 +132,7 @@ public class FourArtifactAutoRed extends OpMode {
   
           case 2:
               if (!follower.isBusy()) {
+                  outake.stopLauncher();
                   follower.followPath(paths.grab);
                   pathState++;
               }
