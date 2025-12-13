@@ -83,10 +83,10 @@ public class FourArtifactAutoBlue extends OpMode {
             START = new Pose(20.981, 122.415, Math.toRadians(145));
             LAUNCH = new Pose(56.604, 87.245, Math.toRadians(135));
 
-            PREP_GRAB_P1 = new Pose(53.736, 87.245);
+            PREP_GRAB_P1 = new Pose(53.736, 81.057);
             PREP_GRAB = new Pose(41.811, 83.472, Math.toRadians(0));
 
-            GRAB = new Pose(41.811, 83.472, Math.toRadians(0));
+            GRAB = new Pose(24.453, 83.472, Math.toRadians(0));
 
             RETURN_P1 = new Pose(51.623, 63.849);
 
@@ -98,11 +98,9 @@ public class FourArtifactAutoBlue extends OpMode {
 
             firstLaunch = follower.pathBuilder()
                     .addPath(new Path(
-                            new BezierLine(
-                                    START, LAUNCH
-                            )
+                            new BezierLine(START, LAUNCH)
                     ))
-                    .setConstantHeadingInterpolation(Math.toRadians(45))
+                    .setLinearHeadingInterpolation(START.getHeading(), LAUNCH.getHeading())
                     .build();
 
             prepForGrab = follower.pathBuilder()
@@ -113,6 +111,7 @@ public class FourArtifactAutoBlue extends OpMode {
                                     PREP_GRAB
                             )
                     ))
+                    .setLinearHeadingInterpolation(LAUNCH.getHeading(), PREP_GRAB.getHeading())
                     .build();
 
             grab = follower.pathBuilder()
@@ -122,6 +121,7 @@ public class FourArtifactAutoBlue extends OpMode {
                                     GRAB
                             )
                     ))
+                    .setLinearHeadingInterpolation(PREP_GRAB.getHeading(), GRAB.getHeading())
                     .build();
 
             returnToLaunch = follower.pathBuilder()
@@ -132,6 +132,7 @@ public class FourArtifactAutoBlue extends OpMode {
                                     LAUNCH
                             )
                     ))
+                    .setLinearHeadingInterpolation(GRAB.getHeading(), LAUNCH.getHeading())
                     .build();
         }
     }
@@ -148,8 +149,7 @@ public class FourArtifactAutoBlue extends OpMode {
                 if (!follower.isBusy()) {
                     intake.start();
                     outake.spinUpLauncher();
-                    int count = 0;
-                    for(int i = 0; i < 10; i++){}
+                    while(outake.getLauncherVelocity() < outake.launchVelocity())
                     outake.requestShot();
                     while(outake.isLaunching()){
                         outake.update();
@@ -179,7 +179,6 @@ public class FourArtifactAutoBlue extends OpMode {
             case 4:
                 if (!follower.isBusy()) {
                     intake.start();
-                    for(int i = 0; i < 50; i++){}
                     outake.requestShot();
                     while(outake.isLaunching()){outake.update();}
                     outake.requestShot();

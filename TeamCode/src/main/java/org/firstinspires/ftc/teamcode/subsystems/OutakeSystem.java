@@ -28,7 +28,7 @@ public class OutakeSystem {
     private static final double STOP_SPEED = 0.0;
     private static final double FULL_SPEED = 1.0;
     private static final double LAUNCHER_TARGET_VELOCITY = 1125 * 1.5;
-    private static final double LAUNCHER_MIN_VELOCITY = 1075;
+    private static final double LAUNCHER_MIN_VELOCITY = 1075 * 1.2;
 
     // When true, reaching the target velocity will automatically advance feeders.
     // When false, the launcher will spin up but will not advance balls until a
@@ -130,6 +130,10 @@ public class OutakeSystem {
 
     public boolean isLaunching(){
         return launching;
+    }
+
+    public double launchVelocity() {
+        return LAUNCHER_MIN_VELOCITY;
     }
 
     public void update() {

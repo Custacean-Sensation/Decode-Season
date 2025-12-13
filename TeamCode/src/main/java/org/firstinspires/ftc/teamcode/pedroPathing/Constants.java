@@ -16,8 +16,8 @@ public class Constants {
 
     public static FollowerConstants followerConstants = new FollowerConstants()
             .mass(8.7)
-            .forwardZeroPowerAcceleration(-34.8)
-            .lateralZeroPowerAcceleration(-55.39);
+            .forwardZeroPowerAcceleration(-22.5)
+            .lateralZeroPowerAcceleration(-45);
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 
@@ -39,8 +39,8 @@ public class Constants {
             .leftRearMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightRearMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .xVelocity(62.50)
-            .yVelocity(51.6);
+            .xVelocity(50)
+            .yVelocity(40);
 
 
 

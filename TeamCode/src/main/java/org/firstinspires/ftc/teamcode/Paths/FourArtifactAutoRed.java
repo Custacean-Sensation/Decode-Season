@@ -58,6 +58,7 @@ public class FourArtifactAutoRed extends OpMode {
         panelsTelemetry.debug("X", follower.getPose().getX());
         panelsTelemetry.debug("Y", follower.getPose().getY());
         panelsTelemetry.debug("Heading", follower.getPose().getHeading());
+        panelsTelemetry.debug("Launching?", outake.isLaunching());
         panelsTelemetry.update(telemetry);
     }
 
@@ -69,7 +70,7 @@ public class FourArtifactAutoRed extends OpMode {
 
         // ---- Pose variables ----
         public final Pose START;
-        public final Pose FIRST_LAUNCH_END;
+        public final Pose LAUNCH;
 
         public final Pose PREP_GRAB_P1;
         public final Pose PREP_GRAB_END;
@@ -77,8 +78,6 @@ public class FourArtifactAutoRed extends OpMode {
         public final Pose GRAB_END;
 
         public final Pose PREP_LAUNCH_END;
-
-        public final Pose SECOND_LAUNCH_END;
 
         // ---- Each segment is its own path object (PathChain of 1 path) ----
         public PathChain firstLaunch;
@@ -91,17 +90,16 @@ public class FourArtifactAutoRed extends OpMode {
             this.follower = follower;
 
             // Define poses once (no magic numbers scattered around)
-            START = new Pose(121.924, 123.139, Math.toRadians(45));
-            FIRST_LAUNCH_END = new Pose(87.884, 87.62, Math.toRadians(45));
+            START = new Pose(126.189, 126.491, Math.toRadians(35));
+            LAUNCH = new Pose(96, 96, Math.toRadians(50));
 
-            PREP_GRAB_P1 = new Pose(103.291, 91.747, Math.toRadians(45));
-            PREP_GRAB_END = new Pose(103.291, 83.241, Math.toRadians(180));
+            PREP_GRAB_P1 = new Pose(94.64, 84.37, Math.toRadians(45));
+            PREP_GRAB_END = new Pose(96, 83.62, Math.toRadians(180));
 
-            GRAB_END = new Pose(124.962, 83.443, Math.toRadians(180));
+            GRAB_END = new Pose(120, 84, Math.toRadians(180));
 
             PREP_LAUNCH_END = new Pose(103.291, 83.241, Math.toRadians(180));
 
-            SECOND_LAUNCH_END = new Pose(103.291, 102.278, Math.toRadians(45));
 
             buildPaths();
         }
@@ -111,54 +109,34 @@ public class FourArtifactAutoRed extends OpMode {
 
             firstLaunch = follower.pathBuilder()
                     .addPath(new Path(
-                            new BezierLine(
-                                    new Pose(START.getX(), START.getY()),
-                                    new Pose(FIRST_LAUNCH_END.getX(), FIRST_LAUNCH_END.getY())
+                            new BezierLine(START, LAUNCH)
                             )
-                    ))
-                    .setConstantHeadingInterpolation(Math.toRadians(45))
+                    )
+                    .setLinearHeadingInterpolation(START.getHeading(), LAUNCH.getHeading())
                     .build();
 
             prepForGrab = follower.pathBuilder()
                     .addPath(new Path(
-                            new BezierCurve(
-                                    new Pose(FIRST_LAUNCH_END.getX(), FIRST_LAUNCH_END.getY()),
-                                    new Pose(PREP_GRAB_P1.getX(), PREP_GRAB_P1.getY()),
-                                    new Pose(PREP_GRAB_END.getX(), PREP_GRAB_END.getY())
+                            new BezierLine(LAUNCH, PREP_GRAB_END)
                             )
-                    ))
-                    .setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(180))
+                    )
+                    .setLinearHeadingInterpolation(LAUNCH.getHeading(), PREP_GRAB_END.getHeading())
                     .build();
 
             grab = follower.pathBuilder()
                     .addPath(new Path(
-                            new BezierLine(
-                                    new Pose(PREP_GRAB_END.getX(), PREP_GRAB_END.getY()),
-                                    new Pose(GRAB_END.getX(), GRAB_END.getY())
-                            )
+                            new BezierLine(PREP_GRAB_END, GRAB_END)
                     ))
-                    .setConstantHeadingInterpolation(Math.toRadians(180))
+                    .setConstantHeadingInterpolation(GRAB_END.getHeading())
                     .build();
 
             prepForLaunch = follower.pathBuilder()
                     .addPath(new Path(
-                            new BezierLine(
-                                    new Pose(GRAB_END.getX(), GRAB_END.getY()),
-                                    new Pose(PREP_LAUNCH_END.getX(), PREP_LAUNCH_END.getY())
-                            )
+                            new BezierLine(GRAB_END, LAUNCH)
                     ))
-                    .setConstantHeadingInterpolation(Math.toRadians(180))
+                    .setLinearHeadingInterpolation(GRAB_END.getHeading(), LAUNCH.getHeading())
                     .build();
 
-            secondLaunch = follower.pathBuilder()
-                    .addPath(new Path(
-                            new BezierLine(
-                                    new Pose(PREP_LAUNCH_END.getX(), PREP_LAUNCH_END.getY()),
-                                    new Pose(SECOND_LAUNCH_END.getX(), SECOND_LAUNCH_END.getY())
-                            )
-                    ))
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(45))
-                    .build();
         }
     }
 
@@ -172,15 +150,13 @@ public class FourArtifactAutoRed extends OpMode {
 
             case 1:
                 if (!follower.isBusy()) {
-                    intake.start();
                     outake.spinUpLauncher();
-                    int count = 0;
+                    while(outake.getLauncherVelocity() < outake.launchVelocity() - 100){outake.update();};
+                    intake.start();
                     outake.requestShot();
-                    while(outake.isLaunching()){
-                        outake.update();
-                    }
+                    while(outake.isLaunching()){outake.update(); panelsTelemetry.addData("launching?", outake.isLaunching()); panelsTelemetry.update();}
                     outake.requestShot();
-                    while(outake.isLaunching()){outake.update();}
+                    while(outake.isLaunching()){outake.update(); panelsTelemetry.addData("launching?", outake.isLaunching()); panelsTelemetry.update();}
                     follower.followPath(paths.prepForGrab);
                     pathState++;
                 }
@@ -203,7 +179,6 @@ public class FourArtifactAutoRed extends OpMode {
 
             case 4:
                 if (!follower.isBusy()) {
-                    follower.followPath(paths.secondLaunch);
                     intake.start();
                     outake.requestShot();
                     while(outake.isLaunching()){outake.update();}
@@ -216,7 +191,6 @@ public class FourArtifactAutoRed extends OpMode {
             case 5:
                 if (!follower.isBusy()) {
                     intake.stop();
-                    outake.stopLauncher();
                     pathState = -1;
                 }
                 break;
