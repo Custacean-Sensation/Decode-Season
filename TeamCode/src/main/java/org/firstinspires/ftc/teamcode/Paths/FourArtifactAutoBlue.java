@@ -149,7 +149,7 @@ public class FourArtifactAutoBlue extends OpMode {
                 if (!follower.isBusy()) {
                     intake.start();
                     outake.spinUpLauncher();
-                    while(outake.getLauncherVelocity() < outake.launchVelocity())
+                    while(outake.getLauncherVelocity() < outake.launchVelocity()){}
                     outake.requestShot();
                     while(outake.isLaunching()){
                         outake.update();
