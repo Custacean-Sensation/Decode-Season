@@ -33,7 +33,8 @@ public class SteelAutoBlue extends OpMode {
     // -------------------------
     private enum AutoState {
         DRIVE_TO_LAUNCH,
-        SPINUP_AND_QUEUE_SHOTS,
+        SPINUP_AND_STAGE,
+        QUEUE_SHOTS,
         WAIT_SHOTS_DONE,
         DRIVE_TO_END,
         DONE
@@ -44,13 +45,24 @@ public class SteelAutoBlue extends OpMode {
 
     private final ElapsedTime stateTimer = new ElapsedTime();
 
-    // Reasonable fail-safes (prevents “stuck forever”)
-    private static final double DRIVE_TIMEOUT_SEC = 6.0;
-    private static final double SPINUP_TIMEOUT_SEC = 3.0;
-    private static final double SHOOT_TIMEOUT_SEC  = 4.0;
+    // ---- Timeouts / fail-safes (do NOT "shoot anyway") ----
+    private static final double DRIVE_TIMEOUT_SEC  = 6.0;
+    private static final double SPINUP_TIMEOUT_SEC = 4.5;  // if not ready by then, skip shooting
+    private static final double SHOOT_TIMEOUT_SEC  = 5.0;  // if jammed/hung, cancel and move on
+
+    // ---- Intake staging + velocity stability gates ----
+    private static final double INTAKE_PREROLL_SEC = 0.25; // ensure intake is running before shot sequence
+    private static final double VEL_TOLERANCE      = 60.0; // velocity must be within this of target
+    private static final double VEL_STABLE_SEC     = 0.25; // must stay in tolerance this long
+
+    private final ElapsedTime intakeTimer = new ElapsedTime();
+    private final ElapsedTime velStableTimer = new ElapsedTime();
 
     // Guard so we only call followPath() once per drive state
     private boolean pathStarted = false;
+
+    // Guard so we only queue shots once
+    private boolean shotsQueued = false;
 
     @Override
     public void init() {
@@ -63,6 +75,9 @@ public class SteelAutoBlue extends OpMode {
 
         paths = new Paths(follower);
         follower.setStartingPose(paths.START);
+        outake.reverseFeedPulse();
+        outake.stopFeeders(); // method that sets both to 0
+
 
         setState(AutoState.DRIVE_TO_LAUNCH);
 
@@ -72,25 +87,34 @@ public class SteelAutoBlue extends OpMode {
 
     @Override
     public void loop() {
-        // Always keep these running
-        follower.update();
-        outake.update();
-
         runAuto();
 
         // Telemetry
         panelsTelemetry.debug("State", state.toString());
         panelsTelemetry.debug("TimeInState", stateTimer.seconds());
         panelsTelemetry.debug("Busy", follower.isBusy());
-        panelsTelemetry.debug("X", follower.getPose().getX());
-        panelsTelemetry.debug("Y", follower.getPose().getY());
-        panelsTelemetry.debug("Heading", follower.getPose().getHeading());
+
+        Pose p = follower.getPose();
+        panelsTelemetry.debug("X", p.getX());
+        panelsTelemetry.debug("Y", p.getY());
+        panelsTelemetry.debug("Heading", p.getHeading());
 
         panelsTelemetry.debug("LauncherVel", outake.getLauncherVelocity());
         panelsTelemetry.debug("LauncherMin", outake.getLauncherMinVelocity());
+        // If you added getLauncherTargetVelocity() in OutakeSystem, this will show real target:
+        // panelsTelemetry.debug("LauncherTarget", outake.getLauncherTargetVelocity());
+
+        panelsTelemetry.debug("VelStableT", velStableTimer.seconds());
+        panelsTelemetry.debug("IntakePreT", intakeTimer.seconds());
         panelsTelemetry.debug("Launching?", outake.isLaunching());
+        panelsTelemetry.debug("ShotsQueued", shotsQueued);
 
         panelsTelemetry.update(telemetry);
+
+        // Always keep these running (never block)
+        follower.update();
+        outake.update();
+
     }
 
     private void runAuto() {
@@ -99,60 +123,113 @@ public class SteelAutoBlue extends OpMode {
             stateTimer.reset();
             pathStarted = false;
             lastState = state;
+
+            // Reset per-state helpers
+            if (state == AutoState.SPINUP_AND_STAGE) {
+                intakeTimer.reset();
+                velStableTimer.reset();
+                shotsQueued = false;
+            }
+            if (state == AutoState.QUEUE_SHOTS) {
+                // keep current timers; just ensure we only queue once
+                shotsQueued = false;
+            }
         }
 
         switch (state) {
             case DRIVE_TO_LAUNCH: {
+                // Spin up early while driving to save time
                 outake.spinUpLauncher();
+
                 if (!pathStarted) {
                     follower.followPath(paths.toLaunch);
                     pathStarted = true;
                 }
 
-                // done condition
                 if (!follower.isBusy()) {
-                    setState(AutoState.SPINUP_AND_QUEUE_SHOTS);
+                    setState(AutoState.SPINUP_AND_STAGE);
                     break;
                 }
 
-                // timeout fallback
                 if (stateTimer.seconds() > DRIVE_TIMEOUT_SEC) {
-                    setState(AutoState.SPINUP_AND_QUEUE_SHOTS);
+                    // If drive is taking too long, proceed anyway (but still won't shoot unless ready)
+                    setState(AutoState.SPINUP_AND_STAGE);
                 }
                 break;
             }
 
-            case SPINUP_AND_QUEUE_SHOTS: {
-                // Keep flywheel commanded on every loop in case your implementation expects it
+            case SPINUP_AND_STAGE: {
                 outake.spinUpLauncher();
 
-                // Stage rings only while shooting
+                // Intake ON to make sure a ring is staged before both shots
                 intake.start();
 
-                boolean ready =
-                        outake.getLauncherVelocity() >= outake.getLauncherMinVelocity();
+                // ---- Velocity stability gate ----
+                double vel = outake.getLauncherVelocity();
 
-                // Queue shots once we’re at speed (or if we time out)
-                if (ready || stateTimer.seconds() > SPINUP_TIMEOUT_SEC) {
-                    outake.requestShots(2); // <- requires the queued-shot OutakeSystem fix
-                    setState(AutoState.WAIT_SHOTS_DONE);
+                // Prefer a real TARGET if you add getLauncherTargetVelocity(). Otherwise, use min as a fallback.
+                // double target = outake.getLauncherTargetVelocity();
+                double target = outake.getLauncherMinVelocity(); // fallback if you didn't add target getter
+
+                // If you only have MIN available, tighten the logic: require vel comfortably above MIN.
+                // This prevents feeding right at the edge.
+                boolean aboveMinWithMargin = vel >= (outake.getLauncherMinVelocity() + 100.0);
+
+                boolean inTol = Math.abs(vel - target) <= VEL_TOLERANCE;
+                if (!inTol) {
+                    velStableTimer.reset();
                 }
+                boolean velStable = velStableTimer.seconds() >= VEL_STABLE_SEC;
+
+                boolean intakePreRolled = intakeTimer.seconds() >= INTAKE_PREROLL_SEC;
+
+                // If you don't have target getter, use aboveMinWithMargin + stability time as the readiness check.
+                boolean readyToShoot = intakePreRolled && (aboveMinWithMargin || velStable);
+
+                if (readyToShoot) {
+                    setState(AutoState.QUEUE_SHOTS);
+                    break;
+                }
+
+                // IMPORTANT: timeout means "skip shooting", NOT "shoot early"
+                if (stateTimer.seconds() > SPINUP_TIMEOUT_SEC) {
+                    intake.stop();
+                    outake.stopLauncher();
+                    setState(AutoState.DRIVE_TO_END);
+                }
+                break;
+            }
+
+            case QUEUE_SHOTS: {
+                // Keep flywheel commanded during shooting
+                outake.spinUpLauncher();
+
+                // Keep intake running until shots are fully complete
+                intake.start();
+
+                if (!shotsQueued) {
+                    outake.requestShots(2); // requires OutakeSystem queue support
+                    shotsQueued = true;
+                }
+
+                setState(AutoState.WAIT_SHOTS_DONE);
                 break;
             }
 
             case WAIT_SHOTS_DONE: {
-                // Wait until the outake reports it finished all queued shots
+                // Explicitly keep intake running until BOTH shots complete
+                intake.start();
+                outake.spinUpLauncher();
+
                 if (!outake.isLaunching()) {
-                    // Stop everything cleanly
                     intake.stop();
                     outake.stopLauncher();
-
                     setState(AutoState.DRIVE_TO_END);
                     break;
                 }
 
-                // fail-safe: don’t hang forever
                 if (stateTimer.seconds() > SHOOT_TIMEOUT_SEC) {
+                    // Jam / hung: cancel and move on
                     intake.stop();
                     outake.stopLauncher();
                     setState(AutoState.DRIVE_TO_END);
@@ -178,10 +255,9 @@ public class SteelAutoBlue extends OpMode {
             }
 
             case DONE: {
-                // Do nothing. Robot will sit still.
+                // Park: keep mechanisms safe/off
                 intake.stop();
-                // Do not keep calling stopLauncher every loop unless you want it:
-                // outake.stopLauncher();
+                // outake.stopLauncher(); // optional; if you want hard-off every loop
                 break;
             }
         }
@@ -189,7 +265,6 @@ public class SteelAutoBlue extends OpMode {
 
     private void setState(AutoState newState) {
         state = newState;
-        // lastState check is handled in runAuto()
     }
 
     // -------------------------

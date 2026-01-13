@@ -24,19 +24,20 @@ public class OutakeSystem {
 
     private final ElapsedTime feederTimer = new ElapsedTime();
 
-    private static final double FEED_TIME_SECONDS = 0.20;
+    private static final double FEED_TIME_SECONDS = 0.25;
     private static final double STOP_SPEED = 0.0;
     private static final double FULL_SPEED = 1.0;
 
     // Keep your constants
     private static final double LAUNCHER_TARGET_VELOCITY = 1125 * 1.5;
-    private static final double LAUNCHER_MIN_VELOCITY    = 1075 * 1.45;
+    private static final double LAUNCHER_MIN_VELOCITY    = 1075 * 1.5;
 
-    // --- New: shot queue ---
+    // --- Shot queue ---
     private int pendingShots = 0;
-
-    // "launching" now means: we are currently servicing one or more requested shots
     private boolean launching = false;
+
+    // --- Manual feed pulse mode (prevents fighting the state machine) ---
+    private boolean manualFeeding = false;
 
     public OutakeSystem(HardwareMap hardwareMap,
                         String launcherName,
@@ -52,10 +53,32 @@ public class OutakeSystem {
         launcher.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,
                 new PIDFCoefficients(300, 0, 0, 10));
 
+        // SAFETY: hard stop feeders immediately
         leftFeeder.setPower(STOP_SPEED);
         rightFeeder.setPower(STOP_SPEED);
+
         leftFeeder.setDirection(DcMotorSimple.Direction.FORWARD);
         rightFeeder.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        // SAFETY: ensure we start fully reset (prevents startup feeding)
+        reset();
+    }
+
+    // -------------------------
+    // Safety reset (call in OpMode init too)
+    // -------------------------
+    public void reset() {
+        pendingShots = 0;
+        launching = false;
+        manualFeeding = false;
+        launchState = LaunchState.IDLE;
+
+        stopFeeders();
+
+        try { launcher.setVelocity(0); } catch (Exception ignored) {}
+        launcher.setPower(0);
+
+        feederTimer.reset();
     }
 
     // -------------------------
@@ -69,7 +92,7 @@ public class OutakeSystem {
         return LAUNCHER_MIN_VELOCITY;
     }
 
-    // Keep your existing name for compatibility (this returns MIN like before)
+    // Legacy name kept for compatibility
     public double launchVelocity() {
         return LAUNCHER_MIN_VELOCITY;
     }
@@ -95,14 +118,15 @@ public class OutakeSystem {
         pendingShots += count;
         launching = true;
 
-        // Make sure we are in the state machine and spinning up
+        // Only enter the shot state machine when we actually have shots queued
         if (launchState == LaunchState.IDLE) {
             launchState = LaunchState.SPIN_UP;
         }
     }
 
     /**
-     * Spin up launcher but do NOT feed unless shots are requested.
+     * Spin up launcher ONLY. This should never arm feeding by itself.
+     * (Feeding happens ONLY when pendingShots > 0 via requestShots)
      */
     public void spinUpLauncher() {
         try {
@@ -111,34 +135,40 @@ public class OutakeSystem {
             launcher.setPower(FULL_SPEED);
         }
 
-        // Stay in SPIN_UP so velocity is maintained; feeding only happens if pendingShots > 0
-        if (launchState == LaunchState.IDLE) {
-            launchState = LaunchState.SPIN_UP;
-        }
+        // CRITICAL FIX:
+        // Do NOT change launchState here. Otherwise you "arm" the feeder logic at startup.
+        // We only enter SPIN_UP through requestShots().
     }
 
     public void manualFeedPulse() {
+        manualFeeding = true;
         feederTimer.reset();
         leftFeeder.setPower(FULL_SPEED);
         rightFeeder.setPower(FULL_SPEED);
     }
 
     public void reverseFeedPulse() {
+        manualFeeding = true;
         feederTimer.reset();
         leftFeeder.setPower(-FULL_SPEED);
         rightFeeder.setPower(-FULL_SPEED);
     }
 
+    public void stopFeeders() {
+        leftFeeder.setPower(STOP_SPEED);
+        rightFeeder.setPower(STOP_SPEED);
+    }
+
     public void stopLauncher() {
-        // Hard stop everything + clear queue + clear launching flag
+        // Hard stop everything + clear queue + clear flags
         pendingShots = 0;
         launching = false;
+        manualFeeding = false;
 
         try { launcher.setVelocity(0); } catch (Exception ignored) {}
         launcher.setPower(0);
 
-        leftFeeder.setPower(STOP_SPEED);
-        rightFeeder.setPower(STOP_SPEED);
+        stopFeeders();
 
         feederTimer.reset();
         launchState = LaunchState.IDLE;
@@ -149,9 +179,25 @@ public class OutakeSystem {
     }
 
     public void update() {
+        // Manual feed pulses: run them and do NOT let the state machine fight them
+        if (manualFeeding) {
+            if (feederTimer.seconds() > FEED_TIME_SECONDS) {
+                stopFeeders();
+                manualFeeding = false;
+            }
+            return;
+        }
+
         switch (launchState) {
             case IDLE:
-                // nothing
+                // Extra safety: make sure feeders stay off in IDLE
+                stopFeeders();
+
+                // If somehow shots are queued while IDLE, enter SPIN_UP
+                if (pendingShots > 0) {
+                    launching = true;
+                    launchState = LaunchState.SPIN_UP;
+                }
                 break;
 
             case SPIN_UP:
@@ -163,12 +209,13 @@ public class OutakeSystem {
                 }
 
                 // Only advance to feeding if we actually have shots queued
-                if (pendingShots > 0 && launcher.getVelocity() > LAUNCHER_MIN_VELOCITY) {
+                if (pendingShots > 0 && launcher.getVelocity() >= LAUNCHER_MIN_VELOCITY) {
                     launchState = LaunchState.LAUNCH;
                 }
                 break;
 
             case LAUNCH:
+                // Feed exactly one shot
                 leftFeeder.setPower(FULL_SPEED);
                 rightFeeder.setPower(FULL_SPEED);
                 feederTimer.reset();
@@ -177,14 +224,13 @@ public class OutakeSystem {
 
             case LAUNCHING:
                 if (feederTimer.seconds() > FEED_TIME_SECONDS) {
-                    leftFeeder.setPower(STOP_SPEED);
-                    rightFeeder.setPower(STOP_SPEED);
+                    stopFeeders();
 
                     // Consume exactly one queued shot
                     pendingShots = Math.max(0, pendingShots - 1);
 
                     if (pendingShots > 0) {
-                        // Go back to SPIN_UP for the next shot (gives time to recover velocity)
+                        // Recover speed between shots
                         launchState = LaunchState.SPIN_UP;
                     } else {
                         launching = false;
@@ -192,12 +238,6 @@ public class OutakeSystem {
                     }
                 }
                 break;
-        }
-
-        // stop manual pulse after FEED_TIME_SECONDS even if not in state machine
-        if (launchState == LaunchState.IDLE && feederTimer.seconds() > FEED_TIME_SECONDS) {
-            leftFeeder.setPower(STOP_SPEED);
-            rightFeeder.setPower(STOP_SPEED);
         }
     }
 }
