@@ -25,7 +25,10 @@ public class AlignToTag extends OpMode {
     // Turning control
     private static final double KP_TURN = 0.03;     // Proportional gain for tx (tune this)
     private static final double MAX_TURN = 0.35;    // Cap turn power so it doesn’t whip
+    private static final double KP_FORWARD = 0.04;
+    private static final double MAX_FWD = 0.4;
     private static final double TX_DEADBAND = 0.5;  // Degrees. Inside this => "good enough"
+    private static final double TY_DEADBAND = 0.5; //Distance from LimeLight
 
     @Override
     public void init() {
@@ -50,7 +53,9 @@ public class AlignToTag extends OpMode {
         double[] botpose = limelight.getBotpose(); // [x,y,z, roll, pitch, yaw] if available
 
         double turnCmd = 0.0;
+        double forwardCmd = 0.0;
         boolean aligning = gamepad1.a; // hold A to align
+        boolean upDown = gamepad1.b; // hold B to align
 
         if (aligning && hasTarget) {
             double error = tx; // degrees right positive per Limelight convention
@@ -64,10 +69,21 @@ public class AlignToTag extends OpMode {
             turnCmd = 0.0;
         }
 
+        if (upDown && hasTarget){
+            double error = ty; // we use it now lol
+            if(Math.abs(error) > TY_DEADBAND){
+                forwardCmd = Range.clip(ty * KP_FORWARD, -MAX_FWD, MAX_FWD);
+            } else {
+                forwardCmd = 0.0;
+            }
+        } else {
+            forwardCmd = 0.0;
+        }
+
         // Rotate in place via drivetrain subsystem. ExampleDrivetrain.mecanumDrive
         // expects (lateral, axial, yaw). To produce left=+turn, right=-turn we pass
         // yaw = -turnCmd (the method negates yaw internally), so use -turnCmd here.
-        dt.mecanumDrive(0.0, 0.0, -turnCmd);
+        dt.mecanumDrive(0.0, forwardCmd, -turnCmd);
 
         // Telemetry — no fluff, just what matters
         telemetry.addData("Aligning (hold A)", aligning);
