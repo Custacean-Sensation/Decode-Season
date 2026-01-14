@@ -34,12 +34,12 @@ public class AlignToTag extends OpMode {
     @Override
     public void init() {
         // Initialize drivetrain subsystem using configured motor names
-        dt = new ExampleDrivetrain(hardwareMap, "lf", "rf", "lb", "rb");
+        dt = new ExampleDrivetrain(hardwareMap, "frontLeft", "frontRight", "backLeft", "backRight");
 
         // Point this at your Limelight. If mDNS isn’t reliable, use the IP.
-        limelight = new LimelightClient("http://limelight.local:5807");
-
+        limelight = new LimelightClient("http://limelight.local:5801");
         telemetry.addLine("AlignToTag: init complete");
+        limelight.start();
         telemetry.update();
     }
 
@@ -88,6 +88,7 @@ public class AlignToTag extends OpMode {
 
         // Telemetry — no fluff, just what matters
         telemetry.addData("Aligning (hold A)", aligning);
+        telemetry.addData("Aligning (hold B)", upDown);
         telemetry.addData("Has Target", hasTarget);
         telemetry.addData("tx (deg)", "%.2f", tx);
         telemetry.addData("ty (deg)", "%.2f", ty - TYSETPOINT);
