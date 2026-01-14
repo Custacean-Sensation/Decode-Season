@@ -28,7 +28,8 @@ public class AlignToTag extends OpMode {
     private static final double KP_FORWARD = 0.04;
     private static final double MAX_FWD = 0.4;
     private static final double TX_DEADBAND = 0.5;  // Degrees. Inside this => "good enough"
-    private static final double TY_DEADBAND = 0.5; //Distance from LimeLight
+    private static final double TY_DEADBAND = 0.5; // Distance from LimeLight
+    private static final double TY_SETPOINT = -5.0; // Camera offset to find correct positioning
 
     @Override
     public void init() {
@@ -70,7 +71,7 @@ public class AlignToTag extends OpMode {
         }
 
         if (upDown && hasTarget){
-            double error = ty; // we use it now lol
+            double error = ty - TYSETPOINT; // we use it now lol
             if(Math.abs(error) > TY_DEADBAND){
                 forwardCmd = Range.clip(ty * KP_FORWARD, -MAX_FWD, MAX_FWD);
             } else {
@@ -89,8 +90,9 @@ public class AlignToTag extends OpMode {
         telemetry.addData("Aligning (hold A)", aligning);
         telemetry.addData("Has Target", hasTarget);
         telemetry.addData("tx (deg)", "%.2f", tx);
-        telemetry.addData("ty (deg)", "%.2f", ty);
+        telemetry.addData("ty (deg)", "%.2f", ty - TYSETPOINT);
         telemetry.addData("turnCmd", "%.3f", turnCmd);
+        telemetry.addData("forwardCmd", "%.3f" forwardCmd);
         if (botpose != null && botpose.length >= 6) {
             telemetry.addData("botpose xy (m)", "%.2f, %.2f", botpose[0], botpose[1]);
             telemetry.addData("botpose yaw (deg)", "%.1f", botpose[5]);
