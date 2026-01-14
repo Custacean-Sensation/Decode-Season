@@ -38,7 +38,7 @@ public class AlignToTag extends OpMode {
         // Initialize drivetrain subsystem using configured motor names
         dt = new ExampleDrivetrain(hardwareMap, "frontLeft", "frontRight", "backLeft", "backRight");
 
-        // Point this at your Limelight. If mDNS isn’t reliable, use the IP.
+        //Use Limelight3a and hardware map
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         telemetry.addLine("AlignToTag: init complete");
         limelight.pipelineSwitch(0);
@@ -67,7 +67,7 @@ public class AlignToTag extends OpMode {
 
         if (aligning && hasTarget) {
             double error = tx; // degrees right positive per Limelight convention
-            if (Math.abs(error) > TX_DEADBAND) {
+            if (Math.abs(error) >= TX_DEADBAND) {
                 turnCmd = Range.clip(error * KP_TURN, -MAX_TURN, MAX_TURN);
             } else {
                 turnCmd = 0.0; // inside deadband, stop rotating
