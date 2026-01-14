@@ -2,8 +2,10 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.util.Range;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.subsystems.ExampleDrivetrain;
 
 /**
@@ -19,8 +21,8 @@ public class AlignToTag extends OpMode {
     // Drivetrain subsystem
     private ExampleDrivetrain dt;
 
-    // Limelight client (HTTP JSON). Change host/IP to your camera.
-    private LimelightClient limelight;
+    // Limelight client (Limelight3A)
+    private Limelight3A limelight;
 
     // Turning control
     private static final double KP_TURN = 0.03;     // Proportional gain for tx (tune this)
@@ -28,7 +30,8 @@ public class AlignToTag extends OpMode {
     private static final double KP_FORWARD = 0.04;
     private static final double MAX_FWD = 0.4;
     private static final double TX_DEADBAND = 0.5;  // Degrees. Inside this => "good enough"
-    private static final double TY_DEADBAND = 0.5; //Distance from LimeLight
+    private static final double TY_DEADBAND = 0.5; // Distance from Limelight
+    private static final double TY_SETPOINT = -5.0; // Camera offset to find correct positioning
 
     @Override
     public void init() {
@@ -36,26 +39,31 @@ public class AlignToTag extends OpMode {
         dt = new ExampleDrivetrain(hardwareMap, "frontLeft", "frontRight", "backLeft", "backRight");
 
         // Point this at your Limelight. If mDNS isn’t reliable, use the IP.
-        limelight = new LimelightClient("http://limelight.local:5807");
-
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
         telemetry.addLine("AlignToTag: init complete");
+        limelight.pipelineSwitch(0);
+        limelight.start();
         telemetry.update();
     }
 
     @Override
     public void loop() {
-        // Pull latest measurements
-        limelight.update();
-
-        boolean hasTarget = limelight.hasTarget();
-        double tx = limelight.getTx();
-        double ty = limelight.getTy(); // not used for rotation, but we show it
-        double[] botpose = limelight.getBotpose(); // [x,y,z, roll, pitch, yaw] if available
+        // Pull latest measurements using the LLResult pattern
+        LLResult result = limelight.getLatestResult();
+        boolean hasTarget = (result != null && result.isValid());
+        double tx = 0.0;
+        double ty = 0.0;
+        Pose3D botpose = null;
+        if (hasTarget) {
+            tx = result.getTx();
+            ty = result.getTy();
+            botpose = result.getBotpose();
+        }
 
         double turnCmd = 0.0;
         double forwardCmd = 0.0;
         boolean aligning = gamepad1.a; // hold A to align
-        boolean upDown = gamepad1.b; // hold B to align
+        boolean upDown = gamepad1.b; // hold B to align forward/back
 
         if (aligning && hasTarget) {
             double error = tx; // degrees right positive per Limelight convention
@@ -69,10 +77,10 @@ public class AlignToTag extends OpMode {
             turnCmd = 0.0;
         }
 
-        if (upDown && hasTarget){
-            double error = ty; // we use it now lol
-            if(Math.abs(error) > TY_DEADBAND){
-                forwardCmd = Range.clip(ty * KP_FORWARD, -MAX_FWD, MAX_FWD);
+        if (upDown && hasTarget) {
+            double error = ty - TY_SETPOINT; // distance error to setpoint
+            if (Math.abs(error) > TY_DEADBAND) {
+                forwardCmd = Range.clip(error * KP_FORWARD, -MAX_FWD, MAX_FWD);
             } else {
                 forwardCmd = 0.0;
             }
@@ -80,20 +88,21 @@ public class AlignToTag extends OpMode {
             forwardCmd = 0.0;
         }
 
-        // Rotate in place via drivetrain subsystem. ExampleDrivetrain.mecanumDrive
+        // Rotate/move via drivetrain subsystem. ExampleDrivetrain.mecanumDrive
         // expects (lateral, axial, yaw). To produce left=+turn, right=-turn we pass
         // yaw = -turnCmd (the method negates yaw internally), so use -turnCmd here.
         dt.mecanumDrive(0.0, forwardCmd, -turnCmd);
 
         // Telemetry — no fluff, just what matters
         telemetry.addData("Aligning (hold A)", aligning);
+        telemetry.addData("Aligning (hold B)", upDown);
         telemetry.addData("Has Target", hasTarget);
         telemetry.addData("tx (deg)", "%.2f", tx);
-        telemetry.addData("ty (deg)", "%.2f", ty);
+        telemetry.addData("ty (deg)", "%.2f", ty - TY_SETPOINT);
         telemetry.addData("turnCmd", "%.3f", turnCmd);
-        if (botpose != null && botpose.length >= 6) {
-            telemetry.addData("botpose xy (m)", "%.2f, %.2f", botpose[0], botpose[1]);
-            telemetry.addData("botpose yaw (deg)", "%.1f", botpose[5]);
+        telemetry.addData("forwardCmd", "%.3f", forwardCmd);
+        if (botpose != null) {
+            telemetry.addData("botpose", botpose.toString());
         }
         telemetry.update();
     }
