@@ -33,7 +33,7 @@ public class AlignToTag extends OpMode {
     @Override
     public void init() {
         // Initialize drivetrain subsystem using configured motor names
-        dt = new ExampleDrivetrain(hardwareMap, "lf", "rf", "lb", "rb");
+        dt = new ExampleDrivetrain(hardwareMap, "frontLeft", "frontRight", "backLeft", "backRight");
 
         // Point this at your Limelight. If mDNS isn’t reliable, use the IP.
         limelight = new LimelightClient("http://limelight.local:5807");
