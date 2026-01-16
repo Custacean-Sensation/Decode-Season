@@ -29,9 +29,9 @@ public class AlignToTag extends OpMode {
     private static final double MAX_TURN = 0.35;    // Cap turn power so it doesn’t whip
     private static final double KP_FORWARD = 0.04;
     private static final double MAX_FWD = 0.4;
-    private static final double TX_DEADBAND = 0.5;  // Degrees. Inside this => "good enough"
-    private static final double TY_DEADBAND = 0.5; // Distance from Limelight
-    private static final double TY_SETPOINT = -5.0; // Camera offset to find correct positioning
+    private static final double TX_DEADBAND = 2.5;  // Degrees. Inside this => "good enough"
+    private static final double TY_DEADBAND = 5.0; // Distance from Limelight
+    private static final double TY_SETPOINT = 0; // Camera offset to find correct positioning
 
     @Override
     public void init() {
@@ -80,7 +80,7 @@ public class AlignToTag extends OpMode {
         if (upDown && hasTarget) {
             double error = ty - TY_SETPOINT; // distance error to setpoint
             if (Math.abs(error) > TY_DEADBAND) {
-                forwardCmd = Range.clip(error * KP_FORWARD, -MAX_FWD, MAX_FWD);
+                    forwardCmd = Range.clip(error * KP_FORWARD, -MAX_FWD, MAX_FWD);
             } else {
                 forwardCmd = 0.0;
             }
@@ -91,7 +91,7 @@ public class AlignToTag extends OpMode {
         // Rotate/move via drivetrain subsystem. ExampleDrivetrain.mecanumDrive
         // expects (lateral, axial, yaw). To produce left=+turn, right=-turn we pass
         // yaw = -turnCmd (the method negates yaw internally), so use -turnCmd here.
-        dt.mecanumDrive(0.0, forwardCmd, -turnCmd);
+        dt.mecanumDrive(forwardCmd, 0.0, turnCmd);
 
         // Telemetry — no fluff, just what matters
         telemetry.addData("Aligning (hold A)", aligning);
