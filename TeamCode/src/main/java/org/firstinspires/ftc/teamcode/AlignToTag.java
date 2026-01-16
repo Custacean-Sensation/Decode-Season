@@ -29,9 +29,9 @@ public class AlignToTag extends OpMode {
     private static final double MAX_TURN = 0.35;    // Cap turn power so it doesn’t whip
     private static final double KP_FORWARD = 0.04;
     private static final double MAX_FWD = 0.4;
-    private static final double TX_DEADBAND = 0.5;  // Degrees. Inside this => "good enough"
-    private static final double TY_DEADBAND = 0.5; // Distance from Limelight
-    private static final double TY_SETPOINT = -5.0; // Camera offset to find correct positioning
+    private static final double TX_DEADBAND = 2.5;  // Degrees. Inside this => "good enough"
+    private static final double TA_DEADBAND = 2.5; // Distance from Limelight
+    private static final double TA_GOAL = 35.0; // Goal for % size of tag
 
     @Override
     public void init() {
@@ -53,10 +53,12 @@ public class AlignToTag extends OpMode {
         boolean hasTarget = (result != null && result.isValid());
         double tx = 0.0;
         double ty = 0.0;
+        double ta = 0.0;
         Pose3D botpose = null;
         if (hasTarget) {
             tx = result.getTx();
             ty = result.getTy();
+            ta = result.getTa();
             botpose = result.getBotpose();
         }
 
@@ -77,9 +79,9 @@ public class AlignToTag extends OpMode {
             turnCmd = 0.0;
         }
 
-        if (upDown && hasTarget) {
-            double error = ty - TY_SETPOINT; // distance error to setpoint
-            if (Math.abs(error) > TY_DEADBAND) {
+        if (upDown && hasTarget && Math.abs(tx) < TX_DEADBAND) {
+            double error = TA_GOAL - ta; // distance error to Goal
+            if (Math.abs(error) > TA_DEADBAND) {
                 forwardCmd = Range.clip(error * KP_FORWARD, -MAX_FWD, MAX_FWD);
             } else {
                 forwardCmd = 0.0;
@@ -90,15 +92,15 @@ public class AlignToTag extends OpMode {
 
         // Rotate/move via drivetrain subsystem. ExampleDrivetrain.mecanumDrive
         // expects (lateral, axial, yaw). To produce left=+turn, right=-turn we pass
-        // yaw = -turnCmd (the method negates yaw internally), so use -turnCmd here.
-        dt.mecanumDrive(0.0, forwardCmd, -turnCmd);
+        dt.mecanumDrive(0.0, forwardCmd, turnCmd);
 
         // Telemetry — no fluff, just what matters
         telemetry.addData("Aligning (hold A)", aligning);
         telemetry.addData("Aligning (hold B)", upDown);
         telemetry.addData("Has Target", hasTarget);
         telemetry.addData("tx (deg)", "%.2f", tx);
-        telemetry.addData("ty (deg)", "%.2f", ty - TY_SETPOINT);
+        telemetry.addData("ty (deg)", "%.2f", ty);
+        telemetry.addData("ta (%)", "%.2f", ta);
         telemetry.addData("turnCmd", "%.3f", turnCmd);
         telemetry.addData("forwardCmd", "%.3f", forwardCmd);
         if (botpose != null) {
