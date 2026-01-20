@@ -79,7 +79,7 @@ public class AlignToTag extends OpMode {
             turnCmd = 0.0;
         }
 
-        if (upDown && hasTarget && Math.abs(tx) < TX_DEADBAND) {
+        if (upDown && hasTarget && Math.abs(ta) < TA_DEADBAND) {
             double error = TA_GOAL - ta; // distance error to Goal
             if (Math.abs(error) > TA_DEADBAND) {
                 forwardCmd = Range.clip(error * KP_FORWARD, -MAX_FWD, MAX_FWD);
@@ -92,7 +92,7 @@ public class AlignToTag extends OpMode {
 
         // Rotate/move via drivetrain subsystem. ExampleDrivetrain.mecanumDrive
         // expects (lateral, axial, yaw). To produce left=+turn, right=-turn we pass
-        dt.mecanumDrive(0.0, forwardCmd, turnCmd);
+        dt.mecanumDrive(forwardCmd, 0.0, turnCmd);
 
         // Telemetry — no fluff, just what matters
         telemetry.addData("Aligning (hold A)", aligning);
