@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import org.firstinspires.ftc.teamcode.RobotConstants;
 
 public class OutakeSystem {
     private final DcMotorEx launcher;
@@ -24,11 +25,6 @@ public class OutakeSystem {
 
     private final ElapsedTime feederTimer = new ElapsedTime();
 
-    private static final double FEED_TIME_SECONDS = 0.20;
-    private static final double STOP_SPEED = 0.0;
-    private static final double FULL_SPEED = 1.0;
-    private static final double LAUNCHER_TARGET_VELOCITY = 1125 * 1.5;
-    private static final double LAUNCHER_MIN_VELOCITY = 1075 * 1.45;
 
     // When true, reaching the target velocity will automatically advance feeders.
     // When false, the launcher will spin up but will not advance balls until a
@@ -49,8 +45,8 @@ public class OutakeSystem {
         launcher.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,
                 new PIDFCoefficients(300, 0, 0, 10));
 
-        leftFeeder.setPower(STOP_SPEED);
-        rightFeeder.setPower(STOP_SPEED);
+        leftFeeder.setPower(RobotConstants.OUTAKE_STOP_SPEED);
+        rightFeeder.setPower(RobotConstants.OUTAKE_STOP_SPEED);
         leftFeeder.setDirection(DcMotorSimple.Direction.FORWARD);
         rightFeeder.setDirection(DcMotorSimple.Direction.REVERSE);
     }
@@ -75,8 +71,8 @@ public class OutakeSystem {
 
     public void manualFeedPulse() {
         feederTimer.reset();
-        leftFeeder.setPower(FULL_SPEED);
-        rightFeeder.setPower(FULL_SPEED);
+        leftFeeder.setPower(RobotConstants.OUTAKE_FULL_SPEED);
+        rightFeeder.setPower(RobotConstants.OUTAKE_FULL_SPEED);
     }
 
     /**
@@ -91,9 +87,9 @@ public class OutakeSystem {
         // Spin up but prevent auto-advancing feeders until an explicit shot is requested
         autoLaunchEnabled = false;
         try {
-            launcher.setVelocity(LAUNCHER_TARGET_VELOCITY);
+            launcher.setVelocity(RobotConstants.OUTAKE_LAUNCHER_TARGET_VELOCITY);
         } catch (Exception ignored) {
-            launcher.setPower(FULL_SPEED);
+            launcher.setPower(RobotConstants.OUTAKE_FULL_SPEED);
         }
         launchState = LaunchState.SPIN_UP;
     }
@@ -104,8 +100,8 @@ public class OutakeSystem {
      */
     public void reverseFeedPulse() {
         feederTimer.reset();
-        leftFeeder.setPower(-FULL_SPEED);
-        rightFeeder.setPower(-FULL_SPEED);
+        leftFeeder.setPower(-RobotConstants.OUTAKE_FULL_SPEED);
+        rightFeeder.setPower(-RobotConstants.OUTAKE_FULL_SPEED);
     }
 
     /**
@@ -122,8 +118,8 @@ public class OutakeSystem {
         launcher.setPower(0);
 
         // Stop feeders and reset timers/state
-        leftFeeder.setPower(STOP_SPEED);
-        rightFeeder.setPower(STOP_SPEED);
+        leftFeeder.setPower(RobotConstants.OUTAKE_STOP_SPEED);
+        rightFeeder.setPower(RobotConstants.OUTAKE_STOP_SPEED);
         feederTimer.reset();
         launchState = LaunchState.IDLE;
     }
@@ -133,7 +129,7 @@ public class OutakeSystem {
     }
 
     public double launchVelocity() {
-        return LAUNCHER_MIN_VELOCITY;
+        return RobotConstants.OUTAKE_LAUNCHER_MIN_VELOCITY;
     }
 
     public void update() {
@@ -144,21 +140,21 @@ public class OutakeSystem {
             case SPIN_UP:
                 // Maintain spin-up target. Only advance to LAUNCH if autoLaunchEnabled
                 // is true (i.e. a shot was explicitly requested).
-                launcher.setVelocity(LAUNCHER_TARGET_VELOCITY);
-                if (autoLaunchEnabled && launcher.getVelocity() > LAUNCHER_MIN_VELOCITY) {
+                launcher.setVelocity(RobotConstants.OUTAKE_LAUNCHER_TARGET_VELOCITY);
+                if (autoLaunchEnabled && launcher.getVelocity() > RobotConstants.OUTAKE_LAUNCHER_MIN_VELOCITY) {
                     launchState = LaunchState.LAUNCH;
                 }
                 break;
             case LAUNCH:
-                leftFeeder.setPower(FULL_SPEED);
-                rightFeeder.setPower(FULL_SPEED);
+                leftFeeder.setPower(RobotConstants.OUTAKE_FULL_SPEED);
+                rightFeeder.setPower(RobotConstants.OUTAKE_FULL_SPEED);
                 feederTimer.reset();
                 launchState = LaunchState.LAUNCHING;
                 break;
             case LAUNCHING:
-                if (feederTimer.seconds() > FEED_TIME_SECONDS) {
-                    leftFeeder.setPower(STOP_SPEED);
-                    rightFeeder.setPower(STOP_SPEED);
+                if (feederTimer.seconds() > RobotConstants.OUTAKE_FEED_TIME_SECONDS) {
+                    leftFeeder.setPower(RobotConstants.OUTAKE_STOP_SPEED);
+                    rightFeeder.setPower(RobotConstants.OUTAKE_STOP_SPEED);
                     launching = false;
                     launchState = LaunchState.IDLE;
                 }
@@ -166,9 +162,9 @@ public class OutakeSystem {
         }
 
         // stop manual pulse after FEED_TIME_SECONDS even if not in state machine
-        if (launchState == LaunchState.IDLE && feederTimer.seconds() > FEED_TIME_SECONDS) {
-            leftFeeder.setPower(STOP_SPEED);
-            rightFeeder.setPower(STOP_SPEED);
+        if (launchState == LaunchState.IDLE && feederTimer.seconds() > RobotConstants.OUTAKE_FEED_TIME_SECONDS) {
+            leftFeeder.setPower(RobotConstants.OUTAKE_STOP_SPEED);
+            rightFeeder.setPower(RobotConstants.OUTAKE_STOP_SPEED);
         }
     }
 }

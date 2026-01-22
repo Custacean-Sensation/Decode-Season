@@ -92,7 +92,7 @@ public class FieldCentricTeleop extends OpMode {
         double turn = -gamepad1.right_stick_x; // rotation
 
         // Optional: small deadzone
-        double deadzone = 0.03;
+        double deadzone = RobotConstants.DRIVE_DEADZONE;
         if (Math.abs(x) < deadzone) x = 0;
         if (Math.abs(y) < deadzone) y = 0;
         if (Math.abs(turn) < deadzone) turn = 0;

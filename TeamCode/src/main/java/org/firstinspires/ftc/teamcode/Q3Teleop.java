@@ -22,10 +22,6 @@ public class Q3Teleop extends OpMode {
     //limelight stuff
     private Limelight3A limelight;
 
-    //turning control for limelight
-    private static final double KP_TURN = 0.03;
-    private static final double MAX_TURN = 0.35; //cap turn power
-    private static final double TX_DEADBAND = 5; //degrees for the good enought window
 
 
     @Override
@@ -109,8 +105,8 @@ public class Q3Teleop extends OpMode {
             boolean aligning = gamepad1.left_bumper; //hold left_bumper to align
             if (aligning && hasTarget) {
                 double error = tx; // degrees right positive per limelight
-                if(Math.abs(error) > TX_DEADBAND) {
-                    turnCmd = Range.clip(error * KP_TURN, -MAX_TURN, MAX_TURN);
+                if(Math.abs(error) > RobotConstants.LIMELIGHT_TX_DEADBAND_Q3) {
+                    turnCmd = Range.clip(error * RobotConstants.LIMELIGHT_KP_TURN, -RobotConstants.LIMELIGHT_MAX_TURN, RobotConstants.LIMELIGHT_MAX_TURN);
                 }else {
                     turnCmd = 0.0;
                 }

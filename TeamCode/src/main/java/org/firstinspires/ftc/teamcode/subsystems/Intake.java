@@ -4,12 +4,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import org.firstinspires.ftc.teamcode.RobotConstants;
 
 public class  Intake {
 
     private DcMotor intakeMotor;
-
-    private double intakePower = 1.0;
 
     // Constructor
     public Intake(HardwareMap hardwareMap, String intakeMotorName) {
@@ -21,12 +20,12 @@ public class  Intake {
 
     // Start both intake and belt
     public void start() {
-        intakeMotor.setPower(intakePower);
+        intakeMotor.setPower(RobotConstants.INTAKE_POWER);
     }
 
     // Spit out artifact(if possible)
     public void reverse() {
-        intakeMotor.setPower(-intakePower);
+        intakeMotor.setPower(-RobotConstants.INTAKE_POWER);
     }
 
     // Stop both intake and belt

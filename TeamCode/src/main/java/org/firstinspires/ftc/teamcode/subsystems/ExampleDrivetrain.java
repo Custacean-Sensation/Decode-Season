@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.GoBildaPinpointDriver;
+import org.firstinspires.ftc.teamcode.RobotConstants;
 
 public class ExampleDrivetrain
 {
@@ -17,11 +18,6 @@ public class ExampleDrivetrain
     private DcMotor backLeft;
     private DcMotor backRight;
     private GoBildaPinpointDriver pinpoint;
-    private final double DRIVE_SPEED = 0.5;
-    private final double ROTATE_SPEED = 0.2;
-    private final double WHEEL_DIAMETER_MM = 96;
-    private final double ENCODER_TICKS_PER_REV = 537.7;
-    private final double TICKS_PER_MM = (ENCODER_TICKS_PER_REV / (WHEEL_DIAMETER_MM * Math.PI));
 
     //constructor
     public ExampleDrivetrain(HardwareMap hw, String fl, String fr, String bl, String br)
@@ -141,7 +137,7 @@ public class ExampleDrivetrain
 
         final double TOLERANCE_MM = 10;
 
-        double targetPosition = (distanceUnit.toMm(distance) * TICKS_PER_MM);
+        double targetPosition = (distanceUnit.toMm(distance) * RobotConstants.TICKS_PER_MM);
 
         resetEncoders();
 
@@ -174,8 +170,8 @@ public class ExampleDrivetrain
 
         double targetMm = angleUnit.toRadians(angle);
 
-        double leftTargetPosition = -(targetMm*TICKS_PER_MM);
-        double rightTargetPosition = targetMm*TICKS_PER_MM;
+        double leftTargetPosition = -(targetMm*RobotConstants.TICKS_PER_MM);
+        double rightTargetPosition = targetMm*RobotConstants.TICKS_PER_MM;
 
         //reset encoders
         resetEncoders();
@@ -242,7 +238,7 @@ public class ExampleDrivetrain
     }
 
     public void fieldCentricDrive(double y, double x, double turn) {
-        double deadzone = 0.03;
+        double deadzone = RobotConstants.DRIVE_DEADZONE;
         if (Math.abs(x) < deadzone) x = 0;
         if (Math.abs(y) < deadzone) y = 0;
         if (Math.abs(turn) < deadzone) turn = 0;

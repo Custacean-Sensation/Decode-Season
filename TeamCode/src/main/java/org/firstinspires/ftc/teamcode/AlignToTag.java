@@ -24,14 +24,7 @@ public class AlignToTag extends OpMode {
     // Limelight client (Limelight3A)
     private Limelight3A limelight;
 
-    // Turning control
-    private static final double KP_TURN = 0.03;     // Proportional gain for tx (tune this)
-    private static final double MAX_TURN = 0.35;    // Cap turn power so it doesn’t whip
-    private static final double KP_FORWARD = 0.04;
-    private static final double MAX_FWD = 0.4;
-    private static final double TX_DEADBAND = 2.5;  // Degrees. Inside this => "good enough"
-    private static final double TA_DEADBAND = 2.5; // Distance from Limelight
-    private static final double TA_GOAL = 35.0; // Goal for % size of tag
+    // Turning control - see RobotConstants for values
 
     @Override
     public void init() {
@@ -69,8 +62,8 @@ public class AlignToTag extends OpMode {
 
         if (aligning && hasTarget) {
             double error = tx; // degrees right positive per Limelight convention
-            if (Math.abs(error) >= TX_DEADBAND) {
-                turnCmd = Range.clip(error * KP_TURN, -MAX_TURN, MAX_TURN);
+            if (Math.abs(error) >= RobotConstants.LIMELIGHT_TX_DEADBAND_ALIGN) {
+                turnCmd = Range.clip(error * RobotConstants.LIMELIGHT_KP_TURN, -RobotConstants.LIMELIGHT_MAX_TURN, RobotConstants.LIMELIGHT_MAX_TURN);
             } else {
                 turnCmd = 0.0; // inside deadband, stop rotating
             }
@@ -79,10 +72,10 @@ public class AlignToTag extends OpMode {
             turnCmd = 0.0;
         }
 
-        if (upDown && hasTarget && Math.abs(ta) < TA_DEADBAND) {
-            double error = TA_GOAL - ta; // distance error to Goal
-            if (Math.abs(error) > TA_DEADBAND) {
-                forwardCmd = Range.clip(error * KP_FORWARD, -MAX_FWD, MAX_FWD);
+        if (upDown && hasTarget && Math.abs(ta) < RobotConstants.LIMELIGHT_TA_DEADBAND) {
+            double error = RobotConstants.LIMELIGHT_TA_GOAL - ta; // distance error to Goal
+            if (Math.abs(error) > RobotConstants.LIMELIGHT_TA_DEADBAND) {
+                forwardCmd = Range.clip(error * RobotConstants.LIMELIGHT_KP_FORWARD, -RobotConstants.LIMELIGHT_MAX_FWD, RobotConstants.LIMELIGHT_MAX_FWD);
             } else {
                 forwardCmd = 0.0;
             }
