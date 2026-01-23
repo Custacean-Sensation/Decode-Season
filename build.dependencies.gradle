@@ -1,4 +1,6 @@
 repositories {
+	maven { url "https://repo.dairy.foundation/releases" }
+	maven { url "https://repo.dairy.foundation/snapshots" }
 	maven { url 'https://jitpack.io' }
     mavenCentral()
     google() // Needed for androidx
@@ -7,6 +9,7 @@ repositories {
 }
 
 dependencies {
+    implementation "com.acmerobotics.slothboard:dashboard:0.2.4+0.5.1"
     implementation "com.pedropathing:ftc:2.0.4"
     implementation "com.bylazar:fullpanels:1.0.10"
     implementation 'org.firstinspires.ftc:Inspection:11.0.0'
