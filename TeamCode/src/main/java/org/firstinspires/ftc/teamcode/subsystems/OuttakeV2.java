@@ -5,8 +5,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Constants;
 
@@ -22,6 +22,13 @@ public class OuttakeV2 {
     private final CRServo lFeeder;
     private final Intake intake;
     private final DigitalChannel beamBreak;
+
+    private final ElapsedTime feederTimer = new ElapsedTime();
+
+    private static final double FEED_TIME_SECONDS = 0.20;
+    private static final double STOP_SPEED = 0.0;
+    private static final double FULL_SPEED = 1.0;
+    private static final double INTAKE_POWER = 0.2;
 
     public OuttakeV2 (HardwareMap hm, String flywheelName, String rFeederName, String lFeederName, String beamBreakName) {
         flywheel = hm.get(DcMotorEx.class, flywheelName);
@@ -62,29 +69,113 @@ public class OuttakeV2 {
 
     public LaunchState launchState = LaunchState.IDLE;
 
-    public void launchMechanism() {
+    /**
+     * Request a launch sequence. Advances from IDLE -> SPIN_UP -> LAUNCH -> LAUNCHING.
+     * The state machine will proceed automatically once flywheel reaches target velocity.
+     */
+    public void requestShot() {
+        if (launchState == LaunchState.IDLE) {
+            launchState = LaunchState.SPIN_UP;
+        }
+    }
+
+    /**
+     * Begin spinning the flywheel to the target velocity without advancing the launch sequence.
+     * Useful for prepping the launcher without feeding.
+     */
+    public void spinUpFlywheel() {
+        if (launchState == LaunchState.IDLE) {
+            launchState = LaunchState.SPIN_UP;
+        }
+    }
+
+    /**
+     * Stop the launch sequence and return to IDLE state.
+     * Stops flywheel, intake, and feeders.
+     */
+    public void stopLauncher() {
+        flywheel.setPower(0);
+        rFeeder.setPower(STOP_SPEED);
+        lFeeder.setPower(STOP_SPEED);
+        intake.stop();
+        feederTimer.reset();
+        launchState = LaunchState.IDLE;
+    }
+
+    /**
+     * Manually pulse the feeders forward for FEED_TIME_SECONDS.
+     */
+    public void manualFeedPulse() {
+        feederTimer.reset();
+        rFeeder.setPower(FULL_SPEED);
+        lFeeder.setPower(FULL_SPEED);
+    }
+
+    /**
+     * Manually pulse the feeders in reverse for FEED_TIME_SECONDS (clear jams).
+     */
+    public void reverseFeedPulse() {
+        feederTimer.reset();
+        rFeeder.setPower(-FULL_SPEED);
+        lFeeder.setPower(-FULL_SPEED);
+    }
+
+    /**
+     * Get the current flywheel velocity.
+     */
+    public double getFlyWheelVelocity() {
+        return flywheel.getVelocity();
+    }
+
+    /**
+     * Main update method implementing the launch state machine.
+     * Should be called every loop iteration to advance state transitions and manage timers.
+     */
+    public void update() {
         switch (launchState) {
             case IDLE:
-                flywheel.setVelocity(Constants.flyWheel.TARGET_VELOCITY / 2);
-                rFeeder.setPower(0);
-                lFeeder.setPower(0);
+                // Keep flywheel at idle speed (half target) for quick spin-up
+                flywheel.setVelocity(Constants.flyWheel.TARGET_VELOCITY / 2.0);
+                rFeeder.setPower(STOP_SPEED);
+                lFeeder.setPower(STOP_SPEED);
                 intake.stop();
                 break;
             case SPIN_UP:
-                flywheel.setVelocity(Constants.flyWheel.TARGET_VELOCITY); //target velocity
+                // Spin up to target velocity
+                flywheel.setVelocity(Constants.flyWheel.TARGET_VELOCITY);
+                // Check if we've reached minimum velocity to proceed to LAUNCH
+                if (flywheel.getVelocity() > Constants.flyWheel.TARGET_VELOCITY * 0.95) {
+                    launchState = LaunchState.LAUNCH;
+                }
                 break;
             case LAUNCH:
-                intake.setIntakePower(0.2);
+                // Start intake at reduced power to load ring into feeder
+                intake.setIntakePower(INTAKE_POWER);
+                // Brief delay before starting feeder
+                if (feederTimer.seconds() < 0.1) {
+                    feederTimer.reset();
+                } else {
+                    launchState = LaunchState.LAUNCHING;
+                }
                 break;
             case LAUNCHING:
-                rFeeder.setPower(1.0);
-                lFeeder.setPower(1.0);
-                if(beamBreak.getState() == false) { //beam break is triggered
-                    rFeeder.setPower(0);
-                    lFeeder.setPower(0);
+                // Run feeders to advance ball through launcher
+                rFeeder.setPower(FULL_SPEED);
+                lFeeder.setPower(FULL_SPEED);
+                // Check beam break sensor or use timed feed
+                if (!beamBreak.getState() || feederTimer.seconds() > FEED_TIME_SECONDS) {
+                    rFeeder.setPower(STOP_SPEED);
+                    lFeeder.setPower(STOP_SPEED);
                     intake.stop();
-                    launchState = LaunchState.IDLE; //reset to idle
+                    launchState = LaunchState.IDLE;
                 }
+                break;
+        }
+
+        // Stop manual pulse after FEED_TIME_SECONDS even if not in state machine
+        if (launchState == LaunchState.IDLE && feederTimer.seconds() > FEED_TIME_SECONDS) {
+            rFeeder.setPower(STOP_SPEED);
+            lFeeder.setPower(STOP_SPEED);
         }
     }
 
