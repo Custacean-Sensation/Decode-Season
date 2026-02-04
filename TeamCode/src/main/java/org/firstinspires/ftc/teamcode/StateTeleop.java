@@ -15,6 +15,8 @@ public class StateTeleop extends OpMode {
 
     OuttakeV2 outtake;
 
+    Limelight limelight;
+
 
     @Override
     public void init() {
@@ -23,6 +25,8 @@ public class StateTeleop extends OpMode {
         dt = new ExampleDrivetrain(hardwareMap, "frontLeft", "frontRight", "backLeft", "backRight", "pinpoint");
         intake = new Intake(hardwareMap, "intake");
         outtake = new OuttakeV2(hardwareMap, "flywheel", "rightFeeder", "leftFeeder", "beamBreak");
+        limelight = new Limelight3A(hardwareMap, "limelight");
+
 
         telemetry.addLine("StateTeleop initialized");
         telemetry.update();
@@ -70,6 +74,10 @@ public class StateTeleop extends OpMode {
 
         // Advance the outtake state machine every loop
         outtake.update();
+
+        if(gamepad1.b){
+            limelight.align();
+        }
 
         telemetry.addData("Flywheel Velocity", outtake.getFlyWheelVelocity());
         telemetry.addData("Launch State", outtake.launchState);
