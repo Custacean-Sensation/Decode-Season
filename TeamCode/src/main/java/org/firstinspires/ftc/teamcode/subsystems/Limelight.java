@@ -47,34 +47,34 @@ public class Limelight{
             botpose = result.getBotpose();
         }
 
-        double turnCmd = 0.0;
-        double forwardCmd = 0.0;
+        double turnCommand = 0.0;
+        double forwardCommand = 0.0;
 
 
         if (hasTarget) {
             double error = tx; // degrees right positive per Limelight convention
             if (Math.abs(error) >= TX_DEADBAND) {
-                turnCmd = Range.clip(error * KP_TURN, -MAX_TURN, MAX_TURN);
+                turnCommand = Range.clip(error * KP_TURN, -MAX_TURN, MAX_TURN);
             } else {
-                turnCmd = 0.0; // inside deadband, stop rotating
+                turnCommad = 0.0; // inside deadband, stop rotating
             }
         } else {
             // When not aligning, you can add your own driver control here if you want.
-            turnCmd = 0.0;
+            turnCommand = 0.0;
         }
 
         if (hasTarget && Math.abs(ta) < TA_DEADBAND) {
             double error = TA_GOAL - ta; // distance error to Goal
             if (Math.abs(error) > TA_DEADBAND) {
-                forwardCmd = Range.clip(error * KP_FORWARD, -MAX_FWD, MAX_FWD);
+                forwardCommand = Range.clip(error * KP_FORWARD, -MAX_FWD, MAX_FWD);
             } else {
-                forwardCmd = 0.0;
+                forwardCommand = 0.0;
             }
         } else {
-            forwardCmd = 0.0;
+            forwardCommand = 0.0;
         }
 
-        dt.mecanumDrive(forwardCmd, 0.0, turnCmd);
+        drivetrain.mecanumDrive(forwardCmd, 0.0, turnCmd);
     }
 
 
