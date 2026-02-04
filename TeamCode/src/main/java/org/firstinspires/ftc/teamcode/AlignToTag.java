@@ -25,13 +25,13 @@ public class AlignToTag extends OpMode {
     private Limelight3A limelight;
 
     // Turning control
-    private static final double KP_TURN = 0.03;     // Proportional gain for tx (tune this)
-    private static final double MAX_TURN = 0.35;    // Cap turn power so it doesn’t whip
-    private static final double KP_FORWARD = 0.04;
-    private static final double MAX_FWD = 0.4;
-    private static final double TX_DEADBAND = 2.5;  // Degrees. Inside this => "good enough"
-    private static final double TA_DEADBAND = 2.5; // Distance from Limelight
-    private static final double TA_GOAL = 35.0; // Goal for % size of tag
+    public static final double KP_TURN = 0.03;     // Proportional gain for tx (tune this)
+    public static final double MAX_TURN = 0.35;    // Cap turn power so it doesn’t whip
+    public static final double KP_FORWARD = 0.04;
+    public static final double MAX_FWD = 0.4;
+    public static final double TX_DEADBAND = 2.5;  // Degrees. Inside this => "good enough"
+    public static final double TA_DEADBAND = 2.5; // Distance from Limelight
+    public static final double TA_GOAL = 35.0; // Goal for % size of tag
 
     @Override
     public void init() {

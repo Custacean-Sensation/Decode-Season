@@ -1,10 +1,15 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.subsystems;
+
+import static org.firstinspires.ftc.teamcode.AlignToTag.*;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.subsystems.ExampleDrivetrain;
+
 
 /**
  * AlignToTag
@@ -14,7 +19,7 @@ import org.firstinspires.ftc.teamcode.subsystems.ExampleDrivetrain;
  * If Limelight has no target, motors stop (no blind spinning).
  */
 public class Limelight{
-    private ExampleDrivetrain Drivetrain;
+    private ExampleDrivetrain drivetrain;
     private Limelight3A limelight;
     private LLResult result;
 
@@ -26,9 +31,9 @@ public class Limelight{
     double turnCommand;
     double forwardCommand;
 
-    public limelight(ExampleDrivetrain dt, HardwareMap hardwareMap, String limelightName){
-        this.Drivetrain = dt;
-        limelight = hardwareMap.get(DcMotor.class, limelightName);
+    public Limelight(ExampleDrivetrain dt, HardwareMap hardwareMap, String limelightName){
+        this.drivetrain = dt;
+        limelight = hardwareMap.get(Limelight3A.class, limelightName);
         limelight.pipelineSwitch(0);
         limelight.start();
     }
@@ -56,7 +61,7 @@ public class Limelight{
             if (Math.abs(error) >= TX_DEADBAND) {
                 turnCommand = Range.clip(error * KP_TURN, -MAX_TURN, MAX_TURN);
             } else {
-                turnCommad = 0.0; // inside deadband, stop rotating
+                turnCommand = 0.0; // inside deadband, stop rotating
             }
         } else {
             // When not aligning, you can add your own driver control here if you want.
@@ -74,7 +79,7 @@ public class Limelight{
             forwardCommand = 0.0;
         }
 
-        drivetrain.mecanumDrive(forwardCmd, 0.0, turnCmd);
+        drivetrain.mecanumDrive(forwardCommand, 0.0, turnCommand);
     }
 
 
