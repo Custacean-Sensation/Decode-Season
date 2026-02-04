@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.subsystems.ExampleDrivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.OutakeSystem;
+import org.firstinspires.ftc.teamcode.subsystems.OuttakeV2;
 
 @TeleOp(name = "Q3 Teleop")
 public class Q3Teleop extends OpMode {
@@ -17,7 +17,7 @@ public class Q3Teleop extends OpMode {
     ExampleDrivetrain dt;
     Intake intake;
 
-    OutakeSystem outake;
+    OuttakeV2 outtake;
 
     //limelight stuff
     private Limelight3A limelight;
@@ -35,7 +35,7 @@ public class Q3Teleop extends OpMode {
         dt = new ExampleDrivetrain(hardwareMap, "frontLeft", "frontRight", "backLeft", "backRight", "pinpoint");
         // Intake API changed: constructor now only needs the intake motor name
         intake = new Intake(hardwareMap, "intake");
-        outake = new OutakeSystem(hardwareMap, "launcher", "leftFeeder", "rightFeeder");
+        outtake = new OuttakeV2(hardwareMap, "flywheel", "rightFeeder", "leftFeeder", "beamBreak");
 
         // Initialize and start the Limelight3A sensor if present
         try {
@@ -74,21 +74,21 @@ public class Q3Teleop extends OpMode {
 
         //outake control
         if (gamepad1.right_bumper){
-            outake.requestShot();
+            outtake.requestShot();
         }
         if (gamepad1.dpad_down){
-            outake.stopLauncher();
+            outtake.stopLauncher();
         }
 
         if (gamepad1.dpad_up) {
             // Spin up the launcher but do NOT advance feeders automatically.
-            outake.spinUpLauncher();
+            outtake.spinUpFlywheel();
         }
         if (gamepad1.dpad_left){
-            outake.reverseFeedPulse();
+            outtake.reverseFeedPulse();
         }
         if (gamepad1.dpad_right) {
-            outake.manualFeedPulse();
+            outtake.manualFeedPulse();
         }
 
         // Align to tag using Limelight3A when left bumper held
@@ -105,12 +105,11 @@ public class Q3Teleop extends OpMode {
             telemetry.addData("limelight/ty", ty);
             if (botpose != null) telemetry.addData("limelight/botpose", botpose.toString());
 
-            double turnCmd = 0.0;
+            double turnCmd;
             boolean aligning = gamepad1.left_bumper; //hold left_bumper to align
             if (aligning && hasTarget) {
-                double error = tx; // degrees right positive per limelight
-                if(Math.abs(error) > TX_DEADBAND) {
-                    turnCmd = Range.clip(error * KP_TURN, -MAX_TURN, MAX_TURN);
+                if(Math.abs(tx) > TX_DEADBAND) {
+                    turnCmd = Range.clip(tx * KP_TURN, -MAX_TURN, MAX_TURN);
                 }else {
                     turnCmd = 0.0;
                 }
@@ -120,8 +119,8 @@ public class Q3Teleop extends OpMode {
         }
 
         // Advance the outake state machine every loop so spin-up and timed feeds work
-        outake.update();
-        telemetry.addData("launcherVel", outake.getLauncherVelocity());
+        outtake.update();
+        telemetry.addData("flywheelVel", outtake.getFlyWheelVelocity());
 
         telemetry.update();
 
