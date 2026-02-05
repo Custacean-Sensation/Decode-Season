@@ -1,7 +1,7 @@
 {
   "startPoint": {
-    "x": 88,
-    "y": 136,
+    "x": 121.25674091441971,
+    "y": 125.70222743259085,
     "heading": "linear",
     "startDeg": 90,
     "endDeg": 180,
@@ -16,7 +16,7 @@
         "y": 93.5,
         "heading": "linear",
         "reverse": false,
-        "startDeg": -90,
+        "startDeg": 37,
         "endDeg": 45
       },
       "controlPoints": [],
@@ -244,6 +244,26 @@
       "locked": false
     }
   ],
+  "settings": {
+    "xVelocity": 75,
+    "yVelocity": 65,
+    "aVelocity": 3.141592653589793,
+    "kFriction": 0.1,
+    "rWidth": 16,
+    "rHeight": 16,
+    "safetyMargin": 1,
+    "maxVelocity": 40,
+    "maxAcceleration": 30,
+    "maxDeceleration": 30,
+    "fieldMap": "decode.webp",
+    "robotImage": "/robot.png",
+    "theme": "auto",
+    "showGhostPaths": false,
+    "showOnionLayers": false,
+    "onionLayerSpacing": 3,
+    "onionColor": "#dc2626",
+    "onionNextPointOnly": false
+  },
   "version": "1.2.1",
-  "timestamp": "2026-01-22T21:45:11.487Z"
+  "timestamp": "2026-02-04T23:26:37.110Z"
 }

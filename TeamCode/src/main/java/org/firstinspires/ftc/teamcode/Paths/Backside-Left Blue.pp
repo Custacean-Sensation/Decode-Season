@@ -1,7 +1,7 @@
 {
   "startPoint": {
-    "x": 56,
-    "y": 136,
+    "x": 21.73036342321219,
+    "y": 124.52051582649473,
     "heading": "linear",
     "startDeg": 90,
     "endDeg": 0,
@@ -16,7 +16,7 @@
         "y": 93.5,
         "heading": "linear",
         "reverse": false,
-        "startDeg": 270,
+        "startDeg": 144,
         "endDeg": 135
       },
       "controlPoints": [],
@@ -24,7 +24,8 @@
       "waitBeforeMs": 0,
       "waitAfterMs": 0,
       "waitBeforeName": "",
-      "waitAfterName": ""
+      "waitAfterName": "",
+      "locked": false
     },
     {
       "id": "mk5zlh9h-5pm8iy",
@@ -244,6 +245,26 @@
       "locked": false
     }
   ],
+  "settings": {
+    "xVelocity": 75,
+    "yVelocity": 65,
+    "aVelocity": 3.141592653589793,
+    "kFriction": 0.1,
+    "rWidth": 16,
+    "rHeight": 16,
+    "safetyMargin": 1,
+    "maxVelocity": 40,
+    "maxAcceleration": 30,
+    "maxDeceleration": 30,
+    "fieldMap": "decode.webp",
+    "robotImage": "/robot.png",
+    "theme": "auto",
+    "showGhostPaths": false,
+    "showOnionLayers": false,
+    "onionLayerSpacing": 3,
+    "onionColor": "#dc2626",
+    "onionNextPointOnly": false
+  },
   "version": "1.2.1",
-  "timestamp": "2026-01-22T21:44:55.092Z"
+  "timestamp": "2026-02-04T23:24:58.597Z"
 }
