@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystems.ExampleDrivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.Limelight;
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeV2;
 
 @TeleOp(name = "State Teleop")
@@ -25,7 +27,7 @@ public class StateTeleop extends OpMode {
         dt = new ExampleDrivetrain(hardwareMap, "frontLeft", "frontRight", "backLeft", "backRight", "pinpoint");
         intake = new Intake(hardwareMap, "intake");
         outtake = new OuttakeV2(hardwareMap, "flywheel", "rightFeeder", "leftFeeder", "beamBreak");
-        limelight = new Limelight3A(hardwareMap, "limelight");
+        limelight = new Limelight(dt, hardwareMap, "limelight");
 
 
         telemetry.addLine("StateTeleop initialized");

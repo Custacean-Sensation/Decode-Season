@@ -1,7 +1,8 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.subsystems.ExampleDrivetrain;
@@ -26,13 +27,13 @@ public class Limelight{
     private double turnCommand;
     private double forwardCommand;
 
-    private KP_TURN = 0.03;
-    private MAX_TURN = 0.35;
-    private TX_DEADBAND = 0.5;
-    private KP_FORWARD = 0.03;
-    private MAX_FWD = 0.35;
-    private TA_DEADBAND = 0.5;
-    private TA_GOAL = 35.0;
+    private double KP_TURN = 0.03;
+    private double MAX_TURN = 0.35;
+    private double TX_DEADBAND = 0.5;
+    private double KP_FORWARD = 0.03;
+    private double MAX_FWD = 0.35;
+    private double TA_DEADBAND = 0.5;
+    private double TA_GOAL = 35.0;
 
     public Limelight(ExampleDrivetrain dt, HardwareMap hardwareMap, String limelightName){
         this.Drivetrain = dt;
@@ -82,7 +83,7 @@ public class Limelight{
             forwardCommand = 0.0;
         }
 
-        Drivetrain.mecanumDrive(forwardCmd, 0.0, turnCmd);
+        Drivetrain.mecanumDrive(forwardCommand, 0.0, turnCommand);
     }
 
 
