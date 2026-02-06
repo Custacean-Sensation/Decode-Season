@@ -35,7 +35,7 @@ public class Q3Teleop extends OpMode {
         dt = new ExampleDrivetrain(hardwareMap, "frontLeft", "frontRight", "backLeft", "backRight", "pinpoint");
         // Intake API changed: constructor now only needs the intake motor name
         intake = new Intake(hardwareMap, "intake");
-        outtake = new OuttakeV2(hardwareMap, "flywheel", "rightFeeder", "leftFeeder", "beamBreak");
+        outtake = new OuttakeV2(hardwareMap, "flywheel", "rightFeeder", "leftFeeder","intakeMotor", "beamBreak");
 
         // Initialize and start the Limelight3A sensor if present
         try {

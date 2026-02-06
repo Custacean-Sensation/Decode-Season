@@ -30,14 +30,14 @@ public class OuttakeV2 {
     private static final double FULL_SPEED = 1.0;
     private static final double INTAKE_POWER = 0.2;
 
-    public OuttakeV2 (HardwareMap hm, String flywheelName, String rFeederName, String lFeederName, String beamBreakName) {
+    public OuttakeV2 (HardwareMap hm, String flywheelName, String rFeederName, String lFeederName,String intakeName, String beamBreakName) {
         flywheel = hm.get(DcMotorEx.class, flywheelName);
         rFeeder = hm.get(CRServo.class, rFeederName);
         lFeeder = hm.get(CRServo.class, lFeederName);
         beamBreak = hm.get(DigitalChannel.class, beamBreakName);
 
 
-        intake = new Intake(hm, "intakeMotor");
+        intake = new Intake(hm, intakeName);
 
         //set directions
         rFeeder.setDirection(DcMotorEx.Direction.REVERSE);

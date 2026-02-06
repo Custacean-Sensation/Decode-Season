@@ -26,7 +26,7 @@ public class StateTeleop extends OpMode {
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         dt = new ExampleDrivetrain(hardwareMap, "frontLeft", "frontRight", "backLeft", "backRight", "pinpoint");
         intake = new Intake(hardwareMap, "intake");
-        outtake = new OuttakeV2(hardwareMap, "flywheel", "rightFeeder", "leftFeeder", "beamBreak");
+        outtake = new OuttakeV2(hardwareMap, "flywheel", "rightFeeder", "leftFeeder", "intakeMotor","beamBreak");
         limelight = new Limelight(dt, hardwareMap, "limelight");
 
 
