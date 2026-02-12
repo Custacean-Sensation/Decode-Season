@@ -244,6 +244,26 @@
       "locked": false
     }
   ],
+  "settings": {
+    "xVelocity": 75,
+    "yVelocity": 65,
+    "aVelocity": 3.141592653589793,
+    "kFriction": 0.1,
+    "rWidth": 16,
+    "rHeight": 16,
+    "safetyMargin": 1,
+    "maxVelocity": 40,
+    "maxAcceleration": 30,
+    "maxDeceleration": 30,
+    "fieldMap": "decode.webp",
+    "robotImage": "/robot.png",
+    "theme": "auto",
+    "showGhostPaths": false,
+    "showOnionLayers": false,
+    "onionLayerSpacing": 3,
+    "onionColor": "#dc2626",
+    "onionNextPointOnly": false
+  },
   "version": "1.2.1",
-  "timestamp": "2026-01-22T21:45:11.487Z"
+  "timestamp": "2026-02-05T21:40:04.706Z"
 }

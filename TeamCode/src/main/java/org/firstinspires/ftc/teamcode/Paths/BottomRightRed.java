@@ -15,7 +15,8 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.OutakeSystem;
 
-@Autonomous(name = "Bottom-Right Red", group = "Autonomous")
+@Autonomous(name = "Backside-Right Red", group = "Autonomous")
+@Configurable
 public class BottomRightRed extends OpMode {
 
     private TelemetryManager panelsTelemetry;
@@ -33,8 +34,8 @@ public class BottomRightRed extends OpMode {
 
         follower = Constants.createFollower(hardwareMap);
 
-        intake = new Intake(hardwareMap, "intakeMotor");
-        outake = new OutakeSystem(hardwareMap, "flywheel", "leftFeeder", "rightFeeder");
+        intake = new Intake(hardwareMap, "intake");
+        outake = new OutakeSystem(hardwareMap, "launcher", "leftFeeder", "rightFeeder");
 
         // Build poses + paths
         paths = new Paths(follower);
@@ -81,7 +82,7 @@ public class BottomRightRed extends OpMode {
             this.follower = follower;
 
             // Define poses from the .pp file
-            START = new Pose(88, 8, Math.toRadians(90));
+            START = new Pose(88, 136, Math.toRadians(90));
             LAUNCH_ZONE = new Pose(94.5, 93.5, Math.toRadians(45));
 
             buildPaths();
@@ -92,7 +93,7 @@ public class BottomRightRed extends OpMode {
                     .addPath(new Path(
                             new BezierLine(START, LAUNCH_ZONE)
                     ))
-                    .setLinearHeadingInterpolation(START.getHeading(), LAUNCH_ZONE.getHeading())
+                    .setLinearHeadingInterpolation(Math.toRadians(-90), LAUNCH_ZONE.getHeading())
                     .build();
 
             moveToArtifactsRow1 = follower.pathBuilder()
