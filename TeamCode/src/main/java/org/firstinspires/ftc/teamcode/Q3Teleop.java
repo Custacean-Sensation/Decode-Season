@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.subsystems.ExampleDrivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.OutakeSystem;
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeV2;
 
 @TeleOp(name = "Q3 Teleop")
@@ -17,7 +18,7 @@ public class Q3Teleop extends OpMode {
     ExampleDrivetrain dt;
     Intake intake;
 
-    OuttakeV2 outtake;
+    OutakeSystem outtake;
 
     //limelight stuff
     private Limelight3A limelight;
@@ -34,8 +35,8 @@ public class Q3Teleop extends OpMode {
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         dt = new ExampleDrivetrain(hardwareMap, "frontLeft", "frontRight", "backLeft", "backRight", "pinpoint");
         // Intake API changed: constructor now only needs the intake motor name
-        intake = new Intake(hardwareMap, "intake");
-        outtake = new OuttakeV2(hardwareMap, "flywheel", "rightFeeder", "leftFeeder", "beamBreak");
+        intake = new Intake(hardwareMap, "intakeMotor");
+        outtake = new OutakeSystem(hardwareMap, "flywheel", "rightFeeder", "leftFeeder");
 
         // Initialize and start the Limelight3A sensor if present
         try {
@@ -82,7 +83,7 @@ public class Q3Teleop extends OpMode {
 
         if (gamepad1.dpad_up) {
             // Spin up the launcher but do NOT advance feeders automatically.
-            outtake.spinUpFlywheel();
+            outtake.spinUpLauncher();
         }
         if (gamepad1.dpad_left){
             outtake.reverseFeedPulse();
@@ -120,7 +121,7 @@ public class Q3Teleop extends OpMode {
 
         // Advance the outake state machine every loop so spin-up and timed feeds work
         outtake.update();
-        telemetry.addData("flywheelVel", outtake.getFlyWheelVelocity());
+        telemetry.addData("flywheelVel", outtake.getLauncherVelocity());
 
         telemetry.update();
 

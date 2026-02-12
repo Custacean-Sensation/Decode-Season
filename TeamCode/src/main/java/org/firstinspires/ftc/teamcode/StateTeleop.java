@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystems.ExampleDrivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.Limelight;
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeV2;
 
 @TeleOp(name = "State Teleop")
@@ -15,14 +17,20 @@ public class StateTeleop extends OpMode {
 
     OuttakeV2 outtake;
 
+    Limelight limelight;
+
+    //TODO fix the intake to set power correctly before start
+
 
     @Override
     public void init() {
         //set up drivetrain and motors and servos
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         dt = new ExampleDrivetrain(hardwareMap, "frontLeft", "frontRight", "backLeft", "backRight", "pinpoint");
-        intake = new Intake(hardwareMap, "intake");
-        outtake = new OuttakeV2(hardwareMap, "flywheel", "rightFeeder", "leftFeeder", "beamBreak");
+        intake = new Intake(hardwareMap, "intakeMotor");
+        outtake = new OuttakeV2(hardwareMap, "flywheel", "rightFeeder", "leftFeeder", intake,"beamBreak");
+        limelight = new Limelight(dt, hardwareMap, "limelight");
+
 
         telemetry.addLine("StateTeleop initialized");
         telemetry.update();
@@ -39,15 +47,6 @@ public class StateTeleop extends OpMode {
 
         if (gamepad1.left_stick_button && gamepad1.right_stick_button) {
             pinpoint.resetPosAndIMU();
-        }
-
-        //intake control
-        if (gamepad1.right_trigger > 0.1) {
-            intake.start();
-        } else if (gamepad1.left_trigger > 0.1) {
-            intake.reverse();
-        } else {
-            intake.stop();
         }
 
         //outtake control
@@ -71,8 +70,30 @@ public class StateTeleop extends OpMode {
         // Advance the outtake state machine every loop
         outtake.update();
 
+        //intake control (after outtake.update to honor intake requests)
+        if (outtake.hasIntakeRequest()) {
+            intake.setIntakePower(outtake.getIntakeRequestPower());
+            if (outtake.getIntakeRequestPower() == 0.0) {
+                intake.stop();
+            } else {
+                intake.start();
+            }
+        } else if (gamepad1.right_trigger > 0.1) {
+            intake.startHigh();
+        } else if (gamepad1.left_trigger > 0.1) {
+            intake.reverse();
+        } else {
+            intake.stop();
+        }
+
+        if(gamepad1.b){
+            limelight.align();
+        }
+
         telemetry.addData("Flywheel Velocity", outtake.getFlyWheelVelocity());
         telemetry.addData("Launch State", outtake.launchState);
+        telemetry.addData("We broke", outtake.breaked());
+        telemetry.addData("# of Artifacts Shot: ", outtake.getArtifactsLaunched());
         telemetry.update();
     }
 }

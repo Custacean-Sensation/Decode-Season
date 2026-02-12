@@ -243,47 +243,9 @@ public class OutakeSystem {
 
     /**
      * Periodic update method that should be called every loop iteration.
-     * Maintains the launcher at idle velocity when not actively launching,
-     * and ensures smooth state transitions through the launch sequence.
-     *
-     * This method replaces update() with enhanced velocity maintenance.
+     * Delegates to update() to avoid duplicate state machines.
      */
     public void periodic() {
-        switch (launchState) {
-            case IDLE:
-                // Keep launcher spinning at reduced speed for faster spin-up
-                launcher.setVelocity(LAUNCHER_IDLE_VELOCITY);
-                break;
-            case SPIN_UP:
-                // Maintain spin-up target. Only advance to LAUNCH if autoLaunchEnabled
-                // is true (i.e. a shot was explicitly requested).
-                launcher.setVelocity(LAUNCHER_TARGET_VELOCITY);
-                if (autoLaunchEnabled && launcher.getVelocity() > LAUNCHER_MIN_VELOCITY) {
-                    launchState = LaunchState.LAUNCH;
-                }
-                break;
-            case LAUNCH:
-                leftFeeder.setPower(FULL_SPEED);
-                rightFeeder.setPower(FULL_SPEED);
-                feederTimer.reset();
-                launchState = LaunchState.LAUNCHING;
-                break;
-            case LAUNCHING:
-                // Maintain velocity during launch for consistency
-                launcher.setVelocity(LAUNCHER_TARGET_VELOCITY);
-                if (feederTimer.seconds() > FEED_TIME_SECONDS) {
-                    leftFeeder.setPower(STOP_SPEED);
-                    rightFeeder.setPower(STOP_SPEED);
-                    launching = false;
-                    launchState = LaunchState.IDLE;
-                }
-                break;
-        }
-
-        // stop manual pulse after FEED_TIME_SECONDS even if not in state machine
-        if (launchState == LaunchState.IDLE && feederTimer.seconds() > FEED_TIME_SECONDS) {
-            leftFeeder.setPower(STOP_SPEED);
-            rightFeeder.setPower(STOP_SPEED);
-        }
+        update();
     }
 }

@@ -34,6 +34,17 @@ public class  Intake {
         intakeMotor.setPower(0);
     }
 
+    //set intake power for either normal or outake system
+    public void startLow(){
+        setIntakePower(0.3);
+        intakeMotor.setPower(intakePower);
+    }
+
+    public void startHigh(){
+        setIntakePower(1.0);
+        intakeMotor.setPower(intakePower);
+    }
+
     public void setIntakePower(double power) {
         intakePower = power;
     }
