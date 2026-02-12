@@ -141,24 +141,7 @@ public class BacksideRightRed extends OpMode {
     }
 
     private void launchAtZone() {
-        outake.spinUpLauncher();
-        while(outake.getLauncherVelocity() < outake.launchVelocity() - 50) {
-            outake.update();
-        }
-        intake.start();
-        outake.requestShot();
-        while(outake.isLaunching()) {
-            outake.update();
-            panelsTelemetry.addData("launching?", outake.isLaunching());
-            panelsTelemetry.update(telemetry);
-        }
-        outake.requestShot();
-        while(outake.isLaunching()) {
-            outake.update();
-            panelsTelemetry.addData("launching?", outake.isLaunching());
-            panelsTelemetry.update(telemetry);
-        }
-        intake.stop();
+        outake.autoShoot(2);
     }
 
     public int autonomousPathUpdate() {
