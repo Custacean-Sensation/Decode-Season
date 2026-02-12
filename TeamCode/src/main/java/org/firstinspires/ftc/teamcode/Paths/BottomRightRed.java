@@ -33,8 +33,8 @@ public class BottomRightRed extends OpMode {
 
         follower = Constants.createFollower(hardwareMap);
 
-        intake = new Intake(hardwareMap, "intake");
-        outake = new OutakeSystem(hardwareMap, "launcher", "leftFeeder", "rightFeeder");
+        intake = new Intake(hardwareMap, "intakeMotor");
+        outake = new OutakeSystem(hardwareMap, "flywheel", "leftFeeder", "rightFeeder");
 
         // Build poses + paths
         paths = new Paths(follower);
@@ -99,28 +99,28 @@ public class BottomRightRed extends OpMode {
                     .addPath(new Path(
                             new BezierLine(LAUNCH_ZONE, new Pose(94.5, 84.5, Math.toRadians(0)))
                     ))
-                    .setLinearHeadingInterpolation(LAUNCH_ZONE.getHeading(), Math.toRadians(0))
+                    .setLinearHeadingInterpolation(LAUNCH_ZONE.getHeading(), Math.toRadians(180))
                     .build();
 
             pickupArtifactsRow1 = follower.pathBuilder()
                     .addPath(new Path(
                             new BezierLine(new Pose(94.5, 84.5, Math.toRadians(0)), new Pose(116.8, 84.5, Math.toRadians(0)))
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
 
             backToLaunchzone1 = follower.pathBuilder()
                     .addPath(new Path(
                             new BezierLine(new Pose(116.8, 84.5, Math.toRadians(0)), LAUNCH_ZONE)
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(0), LAUNCH_ZONE.getHeading())
+                    .setLinearHeadingInterpolation(Math.toRadians(180), LAUNCH_ZONE.getHeading())
                     .build();
 
             downToArtifacts2 = follower.pathBuilder()
                     .addPath(new Path(
                             new BezierLine(LAUNCH_ZONE, new Pose(94.5, 60, Math.toRadians(0)))
                     ))
-                    .setLinearHeadingInterpolation(LAUNCH_ZONE.getHeading(), Math.toRadians(0))
+                    .setLinearHeadingInterpolation(LAUNCH_ZONE.getHeading(), Math.toRadians(180))
                     .build();
 
             pickupArtifacts2 = follower.pathBuilder()

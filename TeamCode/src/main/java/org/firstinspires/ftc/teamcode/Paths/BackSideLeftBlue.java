@@ -14,7 +14,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.OutakeSystem;
+import org.firstinspires.ftc.teamcode.subsystems.OuttakeV2;
 
 @Autonomous(name = "Backside-Left Blue", group = "Autonomous")
 @Configurable
@@ -27,7 +27,7 @@ public class BackSideLeftBlue extends OpMode {
     private Paths paths;
 
     private Intake intake;
-    private OutakeSystem outake;
+    private OuttakeV2 outake;
 
     @Override
     public void init() {
@@ -35,8 +35,8 @@ public class BackSideLeftBlue extends OpMode {
 
         follower = Constants.createFollower(hardwareMap);
 
-        intake = new Intake(hardwareMap, "intake");
-        outake = new OutakeSystem(hardwareMap, "launcher", "leftFeeder", "rightFeeder");
+        intake = new Intake(hardwareMap, "intakeMotor");
+        outake = new OuttakeV2(hardwareMap, "flywheel", "rightFeeder", "leftFeeder", intake, "beamBreak");
 
         // Build poses + paths
         paths = new Paths(follower);
@@ -58,7 +58,7 @@ public class BackSideLeftBlue extends OpMode {
         panelsTelemetry.debug("X", follower.getPose().getX());
         panelsTelemetry.debug("Y", follower.getPose().getY());
         panelsTelemetry.debug("Heading", follower.getPose().getHeading());
-        panelsTelemetry.debug("Launching?", outake.isLaunching());
+        panelsTelemetry.debug("Launch State", outake.launchState.toString());
         panelsTelemetry.update(telemetry);
     }
 
@@ -99,67 +99,50 @@ public class BackSideLeftBlue extends OpMode {
 
             moveToArtifactsRow1 = follower.pathBuilder()
                     .addPath(new Path(
-                            new BezierLine(LAUNCH_ZONE, new Pose(49.5, 84.5, Math.toRadians(180)))
+                            new BezierLine(LAUNCH_ZONE, new Pose(49.5, 84.5, Math.toRadians(0)))
                     ))
-                    .setLinearHeadingInterpolation(LAUNCH_ZONE.getHeading(), Math.toRadians(180))
+                    .setLinearHeadingInterpolation(LAUNCH_ZONE.getHeading(), Math.toRadians(0))
                     .build();
 
             pickupArtifactsRow1 = follower.pathBuilder()
                     .addPath(new Path(
-                            new BezierLine(new Pose(49.5, 84.5, Math.toRadians(180)), new Pose(27.2, 84.5, Math.toRadians(180)))
+                            new BezierLine(new Pose(49.5, 84.5, Math.toRadians(0)), new Pose(27.2, 84.5, Math.toRadians(0)))
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                     .build();
 
             backToLaunchzone1 = follower.pathBuilder()
                     .addPath(new Path(
-                            new BezierLine(new Pose(27.2, 84.5, Math.toRadians(180)), LAUNCH_ZONE)
+                            new BezierLine(new Pose(27.2, 84.5, Math.toRadians(0)), LAUNCH_ZONE)
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(180), LAUNCH_ZONE.getHeading())
+                    .setLinearHeadingInterpolation(Math.toRadians(0), LAUNCH_ZONE.getHeading())
                     .build();
 
             downToArtifacts2 = follower.pathBuilder()
                     .addPath(new Path(
-                            new BezierLine(LAUNCH_ZONE, new Pose(49.5, 60, Math.toRadians(180)))
+                            new BezierLine(LAUNCH_ZONE, new Pose(49.5, 60, Math.toRadians(0)))
                     ))
-                    .setLinearHeadingInterpolation(LAUNCH_ZONE.getHeading(), Math.toRadians(180))
+                    .setLinearHeadingInterpolation(LAUNCH_ZONE.getHeading(), Math.toRadians(0))
                     .build();
 
             pickupArtifacts2 = follower.pathBuilder()
                     .addPath(new Path(
-                            new BezierLine(new Pose(49.5, 60, Math.toRadians(180)), new Pose(27.2, 60, Math.toRadians(180)))
+                            new BezierLine(new Pose(49.5, 60, Math.toRadians(0)), new Pose(27.2, 60, Math.toRadians(0)))
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                     .build();
 
             upToLaunchzone = follower.pathBuilder()
                     .addPath(new Path(
-                            new BezierLine(new Pose(27.2, 60, Math.toRadians(180)), LAUNCH_ZONE)
+                            new BezierLine(new Pose(27.2, 60, Math.toRadians(0)), LAUNCH_ZONE)
                     ))
-                    .setLinearHeadingInterpolation(Math.toRadians(180), LAUNCH_ZONE.getHeading())
+                    .setLinearHeadingInterpolation(Math.toRadians(0), LAUNCH_ZONE.getHeading())
                     .build();
         }
     }
 
     private void launchAtZone() {
-        outake.spinUpLauncher();
-        while(outake.getLauncherVelocity() < outake.launchVelocity() - 50) {
-            outake.update();
-        }
-        intake.start();
-        outake.requestShot();
-        while(outake.isLaunching()) {
-            outake.update();
-            panelsTelemetry.addData("launching?", outake.isLaunching());
-            panelsTelemetry.update(telemetry);
-        }
-        outake.requestShot();
-        while(outake.isLaunching()) {
-            outake.update();
-            panelsTelemetry.addData("launching?", outake.isLaunching());
-            panelsTelemetry.update(telemetry);
-        }
-        intake.stop();
+        outake.autoShoot(2);
     }
 
     public int autonomousPathUpdate() {
