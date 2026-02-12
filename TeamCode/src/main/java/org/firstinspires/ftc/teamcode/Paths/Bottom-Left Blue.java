@@ -73,6 +73,7 @@ public class BottomLeftBlue extends OpMode {
         public PathChain gotoLaunchzone;
         public PathChain moveToArtifactsRow1;
         public PathChain pickupArtifactsRow1;
+        public PathChain backToArtifactsRow1;
         public PathChain backToLaunchzone1;
         public PathChain downToArtifacts2;
         public PathChain pickupArtifacts2;
@@ -98,14 +99,21 @@ public class BottomLeftBlue extends OpMode {
 
             moveToArtifactsRow1 = follower.pathBuilder()
                     .addPath(new Path(
-                            new BezierLine(LAUNCH_ZONE, new Pose(49.5, 84.5, Math.toRadians(180)))
+                            new BezierLine(LAUNCH_ZONE, new Pose(49.5, 35.5, Math.toRadians(180)))
                     ))
                     .setLinearHeadingInterpolation(LAUNCH_ZONE.getHeading(), Math.toRadians(180))
                     .build();
 
             pickupArtifactsRow1 = follower.pathBuilder()
                     .addPath(new Path(
-                            new BezierLine(new Pose(49.5, 84.5, Math.toRadians(180)), new Pose(27.2, 84.5, Math.toRadians(180)))
+                            new BezierLine(new Pose(49.5, 35.5, Math.toRadians(180)), new Pose(27.2, 35.5, Math.toRadians(180)))
+                    ))
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                    .build();
+
+            backToArtifactsRow1 = follower.pathBuilder()
+                    .addPath(new Path(
+                            new BezierLine(new Pose(27.2, 35.5, Math.toRadians(180)), new Pose(49.5, 35.5, Math.toRadians(180)))
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
@@ -191,47 +199,54 @@ public class BottomLeftBlue extends OpMode {
 
             case 4:
                 if (!follower.isBusy()) {
-                    follower.followPath(paths.backToLaunchzone1);
+                    follower.followPath(paths.backToArtifactsRow1);
                     pathState++;
                 }
                 break;
 
             case 5:
                 if (!follower.isBusy()) {
-                    launchAtZone();
+                    follower.followPath(paths.backToLaunchzone1);
                     pathState++;
                 }
                 break;
 
             case 6:
                 if (!follower.isBusy()) {
-                    follower.followPath(paths.downToArtifacts2);
+                    launchAtZone();
                     pathState++;
                 }
                 break;
 
             case 7:
                 if (!follower.isBusy()) {
-                    follower.followPath(paths.pickupArtifacts2);
+                    follower.followPath(paths.downToArtifacts2);
                     pathState++;
                 }
                 break;
 
             case 8:
                 if (!follower.isBusy()) {
-                    follower.followPath(paths.upToLaunchzone);
+                    follower.followPath(paths.pickupArtifacts2);
                     pathState++;
                 }
                 break;
 
             case 9:
                 if (!follower.isBusy()) {
-                    launchAtZone();
+                    follower.followPath(paths.upToLaunchzone);
                     pathState++;
                 }
                 break;
 
             case 10:
+                if (!follower.isBusy()) {
+                    launchAtZone();
+                    pathState++;
+                }
+                break;
+
+            case 11:
                 if (!follower.isBusy()) {
                     outake.stopLauncher();
                     pathState = -1;

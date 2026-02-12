@@ -28,10 +28,10 @@
     },
     {
       "id": "mk5zlh9h-5pm8iy",
-      "name": "move to artifacts row 1",
+      "name": "move to artifacts row 3",
       "endPoint": {
         "x": 94.5,
-        "y": 84.5,
+        "y": 35.5,
         "heading": "linear",
         "reverse": false,
         "startDeg": 45,
@@ -46,10 +46,10 @@
     },
     {
       "id": "mk5zmpu1-oo0oa5",
-      "name": "pick up artifacts row 1",
+      "name": "pick up artifacts row 3",
       "endPoint": {
         "x": 116.8,
-        "y": 84.5,
+        "y": 35.5,
         "heading": "linear",
         "reverse": false,
         "startDeg": 0,
@@ -57,6 +57,24 @@
       },
       "controlPoints": [],
       "color": "#AAAC9A",
+      "waitBeforeMs": 0,
+      "waitAfterMs": 0,
+      "waitBeforeName": "",
+      "waitAfterName": ""
+    },
+    {
+      "id": "mlk0t3ue-wpdx06",
+      "endPoint": {
+        "x": 94.5,
+        "y": 35.5,
+        "heading": "linear",
+        "reverse": false,
+        "startDeg": 0,
+        "endDeg": 0
+      },
+      "controlPoints": [],
+      "color": "#DDD55B",
+      "name": "Path 8",
       "waitBeforeMs": 0,
       "waitAfterMs": 0,
       "waitBeforeName": "",
@@ -215,6 +233,10 @@
     },
     {
       "kind": "path",
+      "lineId": "mlk0t3ue-wpdx06"
+    },
+    {
+      "kind": "path",
       "lineId": "mk5zzkn2-ecrobn"
     },
     {
@@ -265,5 +287,5 @@
     "onionNextPointOnly": false
   },
   "version": "1.2.1",
-  "timestamp": "2026-02-05T21:40:29.104Z"
+  "timestamp": "2026-02-12T22:19:01.825Z"
 }

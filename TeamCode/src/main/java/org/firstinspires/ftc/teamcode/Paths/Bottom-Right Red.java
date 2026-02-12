@@ -73,6 +73,7 @@ public class BottomRightRed extends OpMode {
         public PathChain gotoLaunchzone;
         public PathChain moveToArtifactsRow1;
         public PathChain pickupArtifactsRow1;
+        public PathChain backToArtifactsRow1;
         public PathChain backToLaunchzone1;
         public PathChain downToArtifacts2;
         public PathChain pickupArtifacts2;
@@ -98,21 +99,28 @@ public class BottomRightRed extends OpMode {
 
             moveToArtifactsRow1 = follower.pathBuilder()
                     .addPath(new Path(
-                            new BezierLine(LAUNCH_ZONE, new Pose(94.5, 84.5, Math.toRadians(0)))
+                            new BezierLine(LAUNCH_ZONE, new Pose(94.5, 35.5, Math.toRadians(0)))
                     ))
                     .setLinearHeadingInterpolation(LAUNCH_ZONE.getHeading(), Math.toRadians(0))
                     .build();
 
             pickupArtifactsRow1 = follower.pathBuilder()
                     .addPath(new Path(
-                            new BezierLine(new Pose(94.5, 84.5, Math.toRadians(0)), new Pose(116.8, 84.5, Math.toRadians(0)))
+                            new BezierLine(new Pose(94.5, 35.5, Math.toRadians(0)), new Pose(116.8, 35.5, Math.toRadians(0)))
+                    ))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+                    .build();
+
+            backToArtifactsRow1 = follower.pathBuilder()
+                    .addPath(new Path(
+                            new BezierLine(new Pose(116.8, 35.5, Math.toRadians(0)), new Pose(94.5, 35.5, Math.toRadians(0)))
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                     .build();
 
             backToLaunchzone1 = follower.pathBuilder()
                     .addPath(new Path(
-                            new BezierLine(new Pose(116.8, 84.5, Math.toRadians(0)), LAUNCH_ZONE)
+                            new BezierLine(new Pose(94.5, 35.5, Math.toRadians(0)), LAUNCH_ZONE)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(0), LAUNCH_ZONE.getHeading())
                     .build();
@@ -191,47 +199,54 @@ public class BottomRightRed extends OpMode {
 
             case 4:
                 if (!follower.isBusy()) {
-                    follower.followPath(paths.backToLaunchzone1);
+                    follower.followPath(paths.backToArtifactsRow1);
                     pathState++;
                 }
                 break;
 
             case 5:
                 if (!follower.isBusy()) {
-                    launchAtZone();
+                    follower.followPath(paths.backToLaunchzone1);
                     pathState++;
                 }
                 break;
 
             case 6:
                 if (!follower.isBusy()) {
-                    follower.followPath(paths.downToArtifacts2);
+                    launchAtZone();
                     pathState++;
                 }
                 break;
 
             case 7:
                 if (!follower.isBusy()) {
-                    follower.followPath(paths.pickupArtifacts2);
+                    follower.followPath(paths.downToArtifacts2);
                     pathState++;
                 }
                 break;
 
             case 8:
                 if (!follower.isBusy()) {
-                    follower.followPath(paths.upToLaunchzone);
+                    follower.followPath(paths.pickupArtifacts2);
                     pathState++;
                 }
                 break;
 
             case 9:
                 if (!follower.isBusy()) {
-                    launchAtZone();
+                    follower.followPath(paths.upToLaunchzone);
                     pathState++;
                 }
                 break;
 
             case 10:
+                if (!follower.isBusy()) {
+                    launchAtZone();
+                    pathState++;
+                }
+                break;
+
+            case 11:
                 if (!follower.isBusy()) {
                     outake.stopLauncher();
                     pathState = -1;
