@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.OutakeSystem;
+import org.firstinspires.ftc.teamcode.subsystems.OuttakeV2;
 
 @Autonomous(name = "Backside-Right Red", group = "Autonomous")
 @Configurable
@@ -26,7 +26,7 @@ public class BottomRightRed extends OpMode {
     private Paths paths;
 
     private Intake intake;
-    private OutakeSystem outake;
+    private OuttakeV2 outake;
 
     @Override
     public void init() {
@@ -34,8 +34,8 @@ public class BottomRightRed extends OpMode {
 
         follower = Constants.createFollower(hardwareMap);
 
-        intake = new Intake(hardwareMap, "intake");
-        outake = new OutakeSystem(hardwareMap, "launcher", "leftFeeder", "rightFeeder");
+        intake = new Intake(hardwareMap, "intakeMotor");
+        outake = new OuttakeV2(hardwareMap, "flywheel", "rightFeeder", "leftFeeder", intake, "beamBreak");
 
         // Build poses + paths
         paths = new Paths(follower);
@@ -57,7 +57,7 @@ public class BottomRightRed extends OpMode {
         panelsTelemetry.debug("X", follower.getPose().getX());
         panelsTelemetry.debug("Y", follower.getPose().getY());
         panelsTelemetry.debug("Heading", follower.getPose().getHeading());
-        panelsTelemetry.debug("Launching?", outake.isLaunching());
+        panelsTelemetry.debug("Launch State", outake.launchState.toString());
         panelsTelemetry.update(telemetry);
     }
 
