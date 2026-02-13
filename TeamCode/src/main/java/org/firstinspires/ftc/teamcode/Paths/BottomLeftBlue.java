@@ -74,6 +74,8 @@ public class BottomLeftBlue extends OpMode {
         public PathChain moveToArtifactsRow1;
         public PathChain pickupArtifactsRow1;
         public PathChain backToLaunchzone1;
+
+        public PathChain backToArtifactsRow1;
         public PathChain downToArtifacts2;
         public PathChain pickupArtifacts2;
         public PathChain upToLaunchzone;
