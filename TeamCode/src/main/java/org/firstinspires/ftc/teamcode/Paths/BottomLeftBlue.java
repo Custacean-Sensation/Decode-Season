@@ -98,14 +98,21 @@ public class BottomLeftBlue extends OpMode {
 
             moveToArtifactsRow1 = follower.pathBuilder()
                     .addPath(new Path(
-                            new BezierLine(LAUNCH_ZONE, new Pose(49.5, 84.5, Math.toRadians(0)))
+                            new BezierLine(LAUNCH_ZONE, new Pose(49.5, 35.5, Math.toRadians(0)))
                     ))
                     .setLinearHeadingInterpolation(LAUNCH_ZONE.getHeading(), Math.toRadians(0))
                     .build();
 
             pickupArtifactsRow1 = follower.pathBuilder()
                     .addPath(new Path(
-                            new BezierLine(new Pose(49.5, 84.5, Math.toRadians(180)), new Pose(27.2, 84.5, Math.toRadians(0)))
+                            new BezierLine(new Pose(49.5, 35.5, Math.toRadians(0)), new Pose(27.2, 35.5, Math.toRadians(0)))
+                    ))
+                    .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+                    .build();
+
+            backToArtifactsRow1 = follower.pathBuilder()
+                    .addPath(new Path(
+                            new BezierLine(new Pose(27.2, 35.5, Math.toRadians(180)), new Pose(49.5, 35.5, Math.toRadians(180)))
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                     .build();

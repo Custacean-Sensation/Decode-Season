@@ -27,8 +27,78 @@
       "waitAfterName": ""
     },
     {
+      "id": "mk5zlh9h-5pm8iy",
+      "name": "move to artifacts row 3",
+      "endPoint": {
+        "x": 49.5,
+        "y": 35.5,
+        "heading": "linear",
+        "reverse": false,
+        "startDeg": 135,
+        "endDeg": 180
+      },
+      "controlPoints": [],
+      "color": "#B76D9C",
+      "waitBeforeMs": 0,
+      "waitAfterMs": 0,
+      "waitBeforeName": "",
+      "waitAfterName": ""
+    },
+    {
+      "id": "mk5zmpu1-oo0oa5",
+      "name": "pick up artifacts row 3",
+      "endPoint": {
+        "x": 27.200000000000003,
+        "y": 35.5,
+        "heading": "linear",
+        "reverse": false,
+        "startDeg": 180,
+        "endDeg": 180
+      },
+      "controlPoints": [],
+      "color": "#AAAC9A",
+      "waitBeforeMs": 0,
+      "waitAfterMs": 0,
+      "waitBeforeName": "",
+      "waitAfterName": ""
+    },
+    {
+      "id": "mlk0s85h-h25r9q",
+      "endPoint": {
+        "x": 49.5,
+        "y": 35.5,
+        "heading": "linear",
+        "reverse": false
+      },
+      "controlPoints": [],
+      "color": "#786DDD",
+      "name": "Path 8",
+      "waitBeforeMs": 0,
+      "waitAfterMs": 0,
+      "waitBeforeName": "",
+      "waitAfterName": ""
+    },
+    {
+      "id": "mk5zzkn2-ecrobn",
+      "name": "Go to Launch zone",
+      "endPoint": {
+        "x": 49.5,
+        "y": 93.5,
+        "heading": "linear",
+        "reverse": false,
+        "startDeg": 180,
+        "endDeg": 135
+      },
+      "controlPoints": [],
+      "color": "#D58BAD",
+      "waitBeforeMs": 0,
+      "waitAfterMs": 0,
+      "waitBeforeName": "",
+      "waitAfterName": ""
+    },
+    {
       "id": "mk6014zb-9qa4nj",
-      "name": "Down to artifacts Row 2",
+      "name": "Down to artifacts 2",
       "endPoint": {
         "x": 49.5,
         "y": 60,
@@ -48,7 +118,7 @@
       "id": "mk6025dt-du92xt",
       "name": "Pickup artifacts 2 ",
       "endPoint": {
-        "x": 27,
+        "x": 27.200000000000003,
         "y": 60,
         "heading": "linear",
         "reverse": false,
@@ -57,24 +127,6 @@
       },
       "controlPoints": [],
       "color": "#A65BC8",
-      "waitBeforeMs": 0,
-      "waitAfterMs": 0,
-      "waitBeforeName": "",
-      "waitAfterName": ""
-    },
-    {
-      "id": "ml9ytebc-zfuo86",
-      "endPoint": {
-        "x": 49.5,
-        "y": 60,
-        "heading": "linear",
-        "reverse": false,
-        "startDeg": 180,
-        "endDeg": 180
-      },
-      "controlPoints": [],
-      "color": "#AC8D6C",
-      "name": "Backup",
       "waitBeforeMs": 0,
       "waitAfterMs": 0,
       "waitBeforeName": "",
@@ -93,60 +145,6 @@
       },
       "controlPoints": [],
       "color": "#A577A7",
-      "waitBeforeMs": 0,
-      "waitAfterMs": 0,
-      "waitBeforeName": "",
-      "waitAfterName": ""
-    },
-    {
-      "id": "ml9yw9d2-5fzj6e",
-      "name": "",
-      "endPoint": {
-        "x": 49.5,
-        "y": 36,
-        "heading": "linear",
-        "reverse": false,
-        "startDeg": 135,
-        "endDeg": 180
-      },
-      "controlPoints": [],
-      "color": "#ADA868",
-      "waitBeforeMs": 0,
-      "waitAfterMs": 0,
-      "waitBeforeName": "",
-      "waitAfterName": ""
-    },
-    {
-      "id": "ml9yxgbs-0oo0xp",
-      "name": "Path 7",
-      "endPoint": {
-        "x": 27,
-        "y": 36,
-        "heading": "linear",
-        "reverse": false,
-        "startDeg": 180,
-        "endDeg": 180
-      },
-      "controlPoints": [],
-      "color": "#69789C",
-      "waitBeforeMs": 0,
-      "waitAfterMs": 0,
-      "waitBeforeName": "",
-      "waitAfterName": ""
-    },
-    {
-      "id": "ml9yyvfk-xut3ac",
-      "name": "Path 8",
-      "endPoint": {
-        "x": 49.5,
-        "y": 93.5,
-        "heading": "linear",
-        "reverse": false,
-        "startDeg": 180,
-        "endDeg": 135
-      },
-      "controlPoints": [],
-      "color": "#C6B76A",
       "waitBeforeMs": 0,
       "waitAfterMs": 0,
       "waitBeforeName": "",
@@ -225,15 +223,34 @@
     },
     {
       "kind": "path",
+      "lineId": "mk5zlh9h-5pm8iy"
+    },
+    {
+      "kind": "path",
+      "lineId": "mk5zmpu1-oo0oa5"
+    },
+    {
+      "kind": "path",
+      "lineId": "mlk0s85h-h25r9q"
+    },
+    {
+      "kind": "path",
+      "lineId": "mk5zzkn2-ecrobn"
+    },
+    {
+      "kind": "wait",
+      "id": "mk609yk5-jou2m0",
+      "name": "Launch",
+      "durationMs": 2000,
+      "locked": false
+    },
+    {
+      "kind": "path",
       "lineId": "mk6014zb-9qa4nj"
     },
     {
       "kind": "path",
       "lineId": "mk6025dt-du92xt"
-    },
-    {
-      "kind": "path",
-      "lineId": "ml9ytebc-zfuo86"
     },
     {
       "kind": "path",
@@ -245,18 +262,6 @@
       "name": "Launch",
       "durationMs": 2000,
       "locked": false
-    },
-    {
-      "kind": "path",
-      "lineId": "ml9yw9d2-5fzj6e"
-    },
-    {
-      "kind": "path",
-      "lineId": "ml9yxgbs-0oo0xp"
-    },
-    {
-      "kind": "path",
-      "lineId": "ml9yyvfk-xut3ac"
     }
   ],
   "settings": {
@@ -280,5 +285,5 @@
     "onionNextPointOnly": false
   },
   "version": "1.2.1",
-  "timestamp": "2026-02-05T21:40:17.298Z"
+  "timestamp": "2026-02-12T22:18:23.794Z"
 }
