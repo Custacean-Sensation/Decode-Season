@@ -82,7 +82,7 @@ public class BacksideRightRed extends OpMode {
             this.follower = follower;
 
             // Define poses from the .pp file
-            START = new Pose(88, 136, Math.toRadians(-90));
+            START = new Pose(121.25674091441971, 125.70222743259085, Math.toRadians(37));
             LAUNCH_ZONE = new Pose(94.5, 93.5, Math.toRadians(45));
 
             buildPaths();
@@ -112,7 +112,7 @@ public class BacksideRightRed extends OpMode {
 
             backToLaunchzone1 = follower.pathBuilder()
                     .addPath(new Path(
-                            new BezierLine(new Pose(116.8, 84.5, Math.toRadians(0)), LAUNCH_ZONE)
+                            new BezierLine(new Pose(116.8, 84.5, Math.toRadians(180)), LAUNCH_ZONE)
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), LAUNCH_ZONE.getHeading())
                     .build();
@@ -126,7 +126,7 @@ public class BacksideRightRed extends OpMode {
 
             pickupArtifacts2 = follower.pathBuilder()
                     .addPath(new Path(
-                            new BezierLine(new Pose(94.5, 60, Math.toRadians(180)), new Pose(116.8, 60, Math.toRadians(0)))
+                            new BezierLine(new Pose(94.5, 60, Math.toRadians(180)), new Pose(116.8, 60, Math.toRadians(180)))
                     ))
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();

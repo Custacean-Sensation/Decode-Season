@@ -83,7 +83,7 @@ public class BackSideLeftBlue extends OpMode {
             this.follower = follower;
 
             // Define poses from the .pp file
-            START = new Pose(56, 136, Math.toRadians(270));
+            START = new Pose(21.73036342321219, 124.52051582649473, Math.toRadians(144));
             LAUNCH_ZONE = new Pose(49.5, 93.5, Math.toRadians(135));
 
             buildPaths();
