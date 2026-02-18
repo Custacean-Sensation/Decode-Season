@@ -41,7 +41,7 @@ public class AlignToTag extends OpMode {
 
     @Override
     public void loop() {
-        // Pull latest measurementsgit p
+        // Pull latest measurements
         limelight.update();
 
         boolean hasTarget = limelight.hasTarget();
